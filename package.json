@@ -1,0 +1,57 @@
+{
+  "name": "inWalletcore",
+  "description": "inWallet Core",
+  "author": "Intervalue",
+  "version": "0.2.92",
+  "keywords": [
+    "inWallet",
+    "multisignature"
+  ],
+  "homepage": "https://github.com/intervalue/inWalletcore",
+  "license": "MIT",
+  "repository": {
+    "url": "git://github.com/intervalue/inWalletcore.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/intervalue/inWalletcore/issues"
+  },
+  "browser": {
+    "request": "browser-request",
+    "secp256k1": "secp256k1/js"
+  },
+  "dependencies": {
+    "async": "^1.5.2",
+    "base-58": "0.0.1",
+    "bip39": "^2.3.0",
+    "bitcoinjs-lib": "git+https://github.com/bitcoinjs/bitcoinjs-lib.git",
+    "bitcore-mnemonic": "~1.0.0",
+    "jszip": "^3.1.3",
+    "kapitalize": "0.3.3",
+    "lodash": "^4.6.1",
+    "longjohn": "^0.2.11",
+    "mysql": "^2.10.2",
+    "node4mailer": "git+https://github.com/edemaine/node4mailer.git",
+    "secp256k1": "^3.1.0",
+    "sjcl": "*",
+    "socks": "1.1.10",
+    "sqlite3": "^4.0.6",
+    "superagent": "^3.8.3",
+    "thirty-two": "^1.0.1",
+    "web3": "<0.18.2",
+    "ws": "^1.0.1",
+    "xmlhttprequest": "^1.8.0",
+    "ethereumjs-wallet": "^0.6.2",
+    "ethereumjs-tx": "^1.3.7",
+    "browser-request": "0.3.3",
+    "decimal.js": "^10.2.0",
+    "request": "^2.88.0"
+  },
+  "scripts": {
+    "test": "yarn ava"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "testcheck": "^1.0.0-rc.2"
+  }
+}
