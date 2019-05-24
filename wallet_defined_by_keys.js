@@ -167,7 +167,8 @@ function addWallet(wallet, xPubKey, account, arrWalletDefinitionTemplate, onDone
                             },
                             callback)
                     }],
-                function () {
+                function (err) {
+                    if(err) return onDone(err)
                     console.log("addPublicKey done " + wallet);
                     (arrDeviceAddresses.length === 1) ? onDone() : checkAndFullyApproveWallet(wallet, onDone);
                 }
@@ -271,7 +272,8 @@ function createWallet(xPubKey, account, arrWalletDefinitionTemplate, walletName,
     var wallet = type+'-' + crypto.createHash("sha256").update(xPubKey, "utf8").digest("base64");
     console.log('will create wallet ' + wallet);
     var arrDeviceAddresses = getDeviceAddresses(arrWalletDefinitionTemplate);
-    addWallet(wallet, xPubKey, account, arrWalletDefinitionTemplate, function () {
+    addWallet(wallet, xPubKey, account, arrWalletDefinitionTemplate, function (err) {
+        if(err) handleWallet(null,err);
         handleWallet(wallet);
         if (arrDeviceAddresses.length === 1) // single sig
             return;
@@ -413,6 +415,43 @@ function deleteWalletFromUI(wallet, onDone) {
             db.addQuery(arrQueries, "DELETE FROM transactions_index WHERE address like ?", ['%' + address + '%']);
             // delete unused indirect correspondents
             async.series(arrQueries, function () {
+                light.updateStatu();
+                onDone();
+            });
+        });
+
+    })
+
+}
+
+/**
+ * 根据address删除钱包数据库信息
+ * @param address
+ * @param onDone
+ */
+function deleteWalletFromUIForAddress(address, onDone) {
+    var arrQueries = [];
+    var wallet ;
+    var otherAddresses = [];
+    db.query("select address,wallet from my_addresses where address =?",[address],function (res) {
+        if(res){
+            wallet = res[0].wallet;
+        }
+        db.query("select address from my_addresses where wallet <>?",[wallet],function (res1) {
+            if(res1) res1.forEach(function (t) {
+                otherAddresses.push(t.address);
+            });
+            db.addQuery(arrQueries, "DELETE FROM my_addresses WHERE wallet=?", [wallet]);
+            db.addQuery(arrQueries, "DELETE FROM extended_pubkeys WHERE wallet=?", [wallet]);
+            db.addQuery(arrQueries, "DELETE FROM wallet_signing_paths WHERE wallet=?", [wallet]);
+            db.addQuery(arrQueries, "DELETE FROM wallets WHERE wallet=?", [wallet]);
+            //删除地址时，删除当前地址交易记录（本地其他地址与当前地址关联交易pending状态的交易记录）
+            db.addQuery(arrQueries, "DELETE FROM transactions WHERE (addressFrom =? or addressTo =?) AND addressFrom NOT IN(?) and addressTo  NOT IN(?)", [address, address, otherAddresses, otherAddresses]);
+            db.addQuery(arrQueries, "DELETE FROM transactions WHERE (addressFrom =? or addressTo =?) AND addressFrom  IN(SELECT addressFrom  FROM transactions WHERE result='pending' and addressFrom in (?)) and addressTo IN(SELECT addressTo FROM  transactions WHERE result='pending' and addressTo in(?))", [address, address, otherAddresses, otherAddresses]);
+            db.addQuery(arrQueries, "DELETE FROM transactions_index WHERE address like ?", ['%' + address + '%']);
+            // delete unused indirect correspondents
+            async.series(arrQueries, function (err) {
+                if(err) return onDone(err)
                 light.updateStatu();
                 onDone();
             });
@@ -827,6 +866,7 @@ exports.readDeviceAddressesControllingPaymentAddresses = readDeviceAddressesCont
 
 exports.readCosigners = readCosigners;
 exports.deleteWalletFromUI = deleteWalletFromUI;
+exports.deleteWalletFromUIForAddress = deleteWalletFromUIForAddress;
 exports.derivePubkey = derivePubkey;
 exports.issueAddress = issueAddress;
 exports.createWallet = createWallet;
