@@ -9,6 +9,7 @@ var db = require('./db.js');
 var mutex = require('./mutex.js');
 var _ = require('lodash');
 var bignumber = require("bignumber.js");
+var config = require('./conf.js')
 //运行时存放局部全节点列表
 var localfullnodes = {};
 //与共识网交互的类
@@ -135,7 +136,7 @@ class HashnetHelper {
             console.log("sending unit:");
             let message = JSON.stringify(unit);
             //往共识网发送交易
-            //localfullnode = '172.17.2.151:20553';
+            localfullnode = config.TRANSACTION_URL;
             let result = await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message}));
             // if(JSON.parse(result).code != 200 && JSON.parse(result).data.match(/sender is illegal/g)) {
             //     await sendMessageTry(unit)
@@ -171,7 +172,7 @@ class HashnetHelper {
                 throw new Error('network error, please try again.');
             }
 
-            //localfullnode = '172.17.2.151:20553';
+            localfullnode = config.TRANSACTION_URL;
             let type = [1, 2];
             //从共识网拉取交易记录
             let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/gettransactionlist'), null, buildData({ address,tableIndex,offset, type })));
@@ -212,6 +213,7 @@ class HashnetHelper {
     static async getHashInfo(hash) {
 
         let localfullnode = await HashnetHelper.buildSingleLocalfullnode();
+        localfullnode = config.TRANSACTION_URL;
         try {
             if (!localfullnode) {
                 throw new Error('network error, please try again.');
