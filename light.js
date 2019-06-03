@@ -904,6 +904,7 @@ async function insertIntoBTC(data, address) {
 function updateStatu(){
     ETH_haveUpdate = true;
     haveUpdate = true;
+    tranList = null;
 }
 
 

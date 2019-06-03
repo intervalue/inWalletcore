@@ -14,6 +14,7 @@ var config = require('./conf.js')
 var localfullnodes = {};
 //与共识网交互的类
 var timeStamp = Math.round(Date.now())
+var initGet = true;
 class HashnetHelper {
     //返回一个局部全节点，供调用。
     static async buildSingleLocalfullnode(address) {
@@ -150,6 +151,7 @@ class HashnetHelper {
         }
     }
     //获取交易记录
+
     static async getTransactionHistory(address,tableIndex,offset) {
         //获取局部全节点
         let localfullnode   = await HashnetHelper.buildSingleLocalfullnode(address);
@@ -162,7 +164,8 @@ class HashnetHelper {
             // console.log(rows[0].tableIndex);
             // console.log(rows[0].offsets);
             tableIndex  = rows[0].tableIndex;
-            offset      = rows[0].offsets;
+            offset      = initGet ? rows[0].offsets-10 :rows[0].offsets;
+            initGet = false;
         }else {
             await db.execute("INSERT INTO transactions_index (address ,tableIndex,offsets) VALUES(?,0,0)",address);
         }
