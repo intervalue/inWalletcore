@@ -38,3 +38,7 @@ exports.transationVersion = '2.0';
 exports.NRG_PEER_KBYTE = 100000000;
 exports.BASE_NRG = 500000;
 exports.INVE_VALUE = 1000000000000000000;
+
+exports.wsUrl = 'ws://opay.chainfin.online/ipp/v1/ws';
+exports.dappUrl = 'http://wallet.chainfin.online:8090/walletmgmt/v1/dappinfo/list';
+exports.payUrl = 'http://opay.chainfin.online/ipp/v1/pay/trans';
