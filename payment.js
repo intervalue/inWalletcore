@@ -99,15 +99,15 @@ async function transactionMessage(data,cb) {
 async function transactionContext(data,cb) {
     var Bitcore = require('bitcore-lib');
     NRG_PRICE = await getNrgPrice();
-    if(!NRG_PRICE) return cb(('error,unable to get nrgPrice'),null);
-    try{
+    if (!NRG_PRICE) return cb(('error,unable to get nrgPrice'), null);
+    try {
         let Base64 = require('./base64Code');
-        let noteBase64 = data.note ?  Base64.encode(data.note) :'';
-        let fee = noteBase64 ? (noteBase64.length * 1.0 /1024) * constants.NRG_PEER_KBYTE + constants.BASE_NRG.toString(): constants.BASE_NRG.toString();
+        let noteBase64 = data.note ? Base64.encode(data.note) : '';
+        let fee = noteBase64 ? (noteBase64.length * 1.0 / 1024) * constants.NRG_PEER_KBYTE + constants.BASE_NRG.toString() : constants.BASE_NRG.toString();
         let obj =
             {
                 fromAddress: data.change_address,
-                timestamp:  Math.round(Date.now()),
+                timestamp: Math.round(Date.now()),
                 context: noteBase64,
                 vers: transationVersion,
                 pubkey: data.pubkey,
@@ -118,14 +118,15 @@ async function transactionContext(data,cb) {
         var xPrivKey = new Bitcore.HDPrivateKey.fromString(data.xprivKey);
         let buf_to_sign = objectHash.getUnitHashToSign(obj);
         let pathSign = "m/44'/0'/0'/0/0";
-        let privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size:32});
+        let privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size: 32});
         let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
         obj.signature = signature;
 
-        cb(null,obj);
-    }catch (e) {
+        cb(null, obj);
+    } catch (e) {
         cb(e.toString());
     }
+}
 
 /**
  * 往共识网发送交易
