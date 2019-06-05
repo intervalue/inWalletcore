@@ -56,17 +56,15 @@ async function transactionMessage(data,cb) {
         let noteBase64 = data.note ?  Base64.encode(data.note) :'';
         let fee = noteBase64 ? ((noteBase64.length * 1.0 /1024) * constants.NRG_PEER_KBYTE + constants.BASE_NRG).toString(): constants.BASE_NRG.toString();
         var Decimal = require('decimal.js');
-        let stable = await light.findStable(data.walletId);
-        let stablesFrom = stable[0].amount + stable[0].amount_point / parseInt(1 + zero) - stable[0].fee - stable[0].fee_point / parseInt(1 + zero);
-        let stablesTo = new Decimal(stablesFrom).sub(data.amount).sub(new Decimal(fee*NRG_PRICE / 1000000000000000000)).toString();
+        let stablesFrom = await light.findStable3(data.fromAddress);
+        let stablesTo = new Decimal(stablesFrom).sub(data.amount).sub(new Decimal(fee*NRG_PRICE/1000000000000000000)).toString();
         let compareStables = new Decimal(stablesTo) >0
         if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
-            return cb ("not enough spendable funds from " + data.to_address + " for " + (parseInt(fee) + parseInt(amount)));
+            return cb("not enough spendable funds from " + data.to_address + " for " + (parseInt(data.fee) + parseInt(data.amount)));
         }
-
         let obj =
             {
-                fromAddress: data.change_address,
+                fromAddress: data.fromAddress,
                 toAddress: data.to_address,
                 amount: amountstr,
                 timestamp:  Math.round(Date.now()),
