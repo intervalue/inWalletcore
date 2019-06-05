@@ -281,7 +281,7 @@ class HashnetHelper {
         let localfullnode = config.TRANSACTION_URL;
 
         try {
-            let result = JSON.parse(await webhelper.httpPost(getUrl(localfullnode, '/v1/account/info'), null, {address:address}));
+            let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/account/info'), null, {address:address}));
             if (result.code == 200) {
                 let data = JSON.parse(result.data);
                 return data;

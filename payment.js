@@ -140,22 +140,22 @@ async function contractTransactionData(opts,cb) {
     // let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
     let amountstr = (amount+amountP).replace(/\b(0+)/gi,"")+zero.substring(-1,zero.length-amountP.length);
     try {
-        let info = hashnethelper.getAccountInfo(opts.fromAddress);
-        let noce = info.noce;
+        let info = await hashnethelper.getAccountInfo(opts.fromAddress);
+        let nonce = info.nonce;
         let callData = opts.callData;
-        let gasPrice = NRG_PRICE;
+        let gasPrice = NRG_PRICE+"";
         let value = amountstr;
-        let gasLimit = constants.BASE_NRG;
+        let gasLimit = constants.BASE_NRG+"";
         let toAddress = opts.toAddress;
         let data ={
-            noce: noce,
+            nonce: nonce,
             callData: "3a93424a0000000000000000000000000000000"+callData,
             gasPrice: gasPrice,
             value: value,
             gasLimit: gasLimit,
             toAddress: toAddress
         }
-        data = new Buffer(JSON.stringify(data)).toString("base64");
+        data = formatToBase64(data);
         let obj = {
                 fromAddress: opts.fromAddress,
                 timestamp: Math.round(Date.now()),
@@ -287,6 +287,15 @@ let getUrl = (localfullnode, suburl) => {
 //组装往共识网发送数据的对象
 let buildData = (data) => {
     return JSON.parse(JSON.stringify(data));
+}
+
+let formatToBase64 =(data) =>{
+    let m ={};
+    for(let i in data){
+        m[i] = new Buffer(data[i]).toString("base64");
+    }
+    return new Buffer(JSON.stringify(m)).toString("base64")
+
 }
 
 module.exports = {
