@@ -13,6 +13,8 @@ const device = require("./device.js");
 const _ = require('lodash');
 var light = require('./light.js');
 const config = require('./conf.js')
+const zero = '000000000000000000';
+var mutex = require('./mutex.js');
 /**
  * 获取NRG_PRICE
  * @returns {number}
@@ -47,7 +49,7 @@ async function transactionMessage(data,cb) {
     NRG_PRICE = await getNrgPrice();
     if(!NRG_PRICE) return cb(('error,unable to get nrgPrice'),null);
     try{
-        let zero = '000000000000000000';
+
         let amount = (data.amount + "").split('.')[0];
         let amountP = (data.amount + "").split('.')[1] ? (data.amount + "").split('.')[1] : '';
         let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
@@ -126,6 +128,55 @@ async function transactionContext(data,cb) {
     }
 }
 
+/**构造合约交易
+ * @param data
+ */
+async function contractTransactionData(opts,cb) {
+    var Bitcore = require('bitcore-lib');
+    NRG_PRICE = await getNrgPrice();
+    if (!NRG_PRICE) return cb(('error,unable to get nrgPrice'), null);
+    let amount = (opts.amount + "").split('.')[0];
+    let amountP = (opts.amount + "").split('.')[1] ? (opts.amount + "").split('.')[1] : '';
+    // let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
+    let amountstr = (amount+amountP).replace(/\b(0+)/gi,"")+zero.substring(-1,zero.length-amountP.length);
+    try {
+        let info = hashnethelper.getAccountInfo(opts.fromAddress);
+        let noce = info.noce;
+        let callData = opts.callData;
+        let gasPrice = NRG_PRICE;
+        let value = amountstr;
+        let gasLimit = constants.BASE_NRG;
+        let toAddress = opts.toAddress;
+        let data ={
+            noce: noce,
+            callData: "3a93424a0000000000000000000000000000000"+callData,
+            gasPrice: gasPrice,
+            value: value,
+            gasLimit: gasLimit,
+            toAddress: toAddress
+        }
+        data = new Buffer(JSON.stringify(data)).toString("base64");
+        let obj = {
+                fromAddress: opts.fromAddress,
+                timestamp: Math.round(Date.now()),
+                data: data,
+                vers: transationVersion,
+                pubkey: opts.pubkey,
+                type: 2
+            }
+        var xPrivKey = new Bitcore.HDPrivateKey.fromString(opts.xprivKey);
+        let buf_to_sign = objectHash.getUnitHashToSign(obj);
+        let pathSign = "m/44'/0'/0'/0/0";
+        let privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size: 32});
+        let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
+        obj.signature = signature;
+
+        cb(null, obj);
+    } catch (e) {
+        cb(e.toString());
+    }
+}
+
 /**
  * 往共识网发送交易
  * @param data
@@ -148,6 +199,7 @@ async function sendTransactions(opts, cb){
         let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message})));
         if (resultMessage.code != 200) {
             //如果发送失败，则马上返回到界面
+            await inserTrans(opts)
             cb(resultMessage.data, null);
         }else {
             cb(null,resultMessage)
@@ -195,6 +247,39 @@ function sendTransactionToOtherServer(data, cb){
 
 }
 
+let inserTrans = async (obj) => {
+    let amount = obj.amount;
+    let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
+    let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
+    let NRG_PRICE = obj.nrgPrice;
+    let fee = (obj.fee * NRG_PRICE).toString();
+    let feeInt = parseInt(fee.replace(/"/g,'').substring(-1,fee.length-18) ? fee.replace(/"/g,'').substring(-1,fee.length-18) : 0);
+    let feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
+    let Base64 = require('./base64Code');
+    let note = tran.remark ? await Base64.decode(tran.remark) : '';
+    await mutex.lock(["write"], async function (unlock) {
+        try {
+            //更新数据库
+            await db.execute("INSERT INTO transactions (id,creation_date,amount,fee,addressFrom,addressTo,result,type,remark,amount_point,fee_point, multiHash) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                obj.signature, obj.timestamp, amountInt, feeInt, obj.fromAddress, obj.toAddress, "pending", obj.sendType ? obj.sendType : 0 ,note, amountPoint, feePoint,obj.order);
+            //更新列表
+            obj.isStable = 1;
+            obj.isValid = 0;
+            light.refreshTranList(obj);
+           return '';
+
+        }
+        catch (e) {
+            console.log(e.toString());
+          return toString()
+        }
+        finally {
+            //解锁队列
+            await unlock();
+        }
+    });
+}
+
 //组装访问共识网的url
 let getUrl = (localfullnode, suburl) => {
     return 'http://' + localfullnode + suburl;
@@ -208,5 +293,6 @@ module.exports = {
     transactionMessage: transactionMessage,
     sendTransactions: sendTransactions,
     transactionContext: transactionContext,
-    sendTransactionToOtherServer: sendTransactionToOtherServer
+    sendTransactionToOtherServer: sendTransactionToOtherServer,
+    contractTransactionData: contractTransactionData
 }

@@ -18,10 +18,13 @@ var composer = require('./composer.js');
 var balances = require('./balances');
 var light = require('./light.js');
 var bignumber = require('bignumber.js');
-
+const Bitcore = require('bitcore-lib');
+var Mnemonic = require('bitcore-mnemonic');
+const sjcl = require('sjcl');
 var message_counter = 0; //統計接受消息數
 var assocLastFailedAssetMetadataTimestamps = {};
 var ASSET_METADATA_RETRY_PERIOD = 3600 * 1000;
+var wallet_defined_by_keys = require('./wallet_defined_by_keys')
 
 function handleJustsaying(ws, subject, body) {
     switch (subject) {
@@ -984,6 +987,72 @@ function getWallets(cb) {
     });
 }
 
+/**
+ * 生成地址
+ * @param words
+ * @returns {{xprivKey: *, xpubkey, pubkey: *, address: *}}
+ */
+function createWallet(words, password, acount, cb) {
+    try{
+        var m = new Mnemonic(words);
+        let xprivKey = m.toHDPrivateKey().xprivkey;//主私钥
+        let xpubkey = m.toHDPrivateKey().xpubkey;//主公钥
+        var xPrivKey = new Bitcore.HDPrivateKey.fromString(xprivKey);
+        var path2 = "m/44'/0'/0'";
+        var privateKey2 = xPrivKey.derive(path2);
+        var xPubkey = Bitcore.HDPublicKey(privateKey2).xpubkey;
+        var path = "m/0/";
+        if(acount)path+=acount;
+        else path+='0';
+        var pubkey = wallet_defined_by_keys.derivePubkey(xPubkey,path);//扩展公钥，用于验证签名
+        var arrDefinition = ["sig",{"pubkey":pubkey}];
+        var address = objectHash.getChash160(arrDefinition);
+        let obj = {
+            mnemonic: (password, words),
+            xprivKey: encryption(password, xprivKey),
+            xpubkey: xpubkey,
+            pubkey: pubkey,
+            address: address
+        }
+        cb(null, obj)
+    }catch (e) {
+        cb(e.toString());
+    }
+
+}
+
+/**
+ * 加密数据
+ * @param password
+ * @param data
+ * @returns {*}
+ * @constructor
+ */
+function encryption(password, data, opts){
+    try{
+        return sjcl.encrypt(password, data, opts);
+    }catch (e) {
+        return e.toString();
+    }
+
+}
+
+/**
+ * 解密数据
+ * @param password
+ * @param data
+ * @returns {*}
+ * @constructor
+ */
+function decryption(password, data) {
+    try{
+        return sjcl.decrypt(password, data);
+    }catch (e) {
+        return e.toString();
+    }
+
+}
+
 
 exports.readSharedBalance = readSharedBalance;
 exports.readBalance = readBalance;
@@ -998,3 +1067,6 @@ exports.readDeviceAddressesUsedInSigningPaths = readDeviceAddressesUsedInSigning
 exports.determineIfDeviceCanBeRemoved = determineIfDeviceCanBeRemoved;
 exports.findFirstAddress = findFirstAddress;
 exports.findAddressForJoint = findAddressForJoint;
+exports.createWallet = createWallet;
+exports.decryption = decryption;
+exports.encryption = encryption;
