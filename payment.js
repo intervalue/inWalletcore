@@ -16,6 +16,7 @@ const config = require('./conf.js')
 const zero = '000000000000000000';
 var mutex = require('./mutex.js');
 var Decimal = require('decimal.js');
+var db = require('./db.js');
 /**
  * 获取NRG_PRICE
  * @returns {number}
@@ -259,6 +260,7 @@ function sendTransactionToOtherServer(data, cb){
 }
 
 let inserTrans = async (obj) => {
+    console.log('insertobjs:  ',obj)
     let amount = obj.amount;
     let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
     let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
@@ -267,7 +269,7 @@ let inserTrans = async (obj) => {
     let feeInt = parseInt(fee.replace(/"/g,'').substring(-1,fee.length-18) ? fee.replace(/"/g,'').substring(-1,fee.length-18) : 0);
     let feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
     let Base64 = require('./base64Code');
-    let note = tran.remark ? await Base64.decode(tran.remark) : '';
+    let note = obj.remark ? await Base64.decode(obj.remark) : '';
     await mutex.lock(["write"], async function (unlock) {
         try {
             //更新数据库

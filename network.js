@@ -859,8 +859,8 @@ async function requestOtherTransactionHistory(){
     //     return;
     // }
     // await light.updateHistory(addresses);
-    let wallet = require("./wallet");
-    wallet.getWallets(function (res) {
+    let wallets = require('./wallet.js');
+    wallets.getWallets(function (res) {
         //eventBus.emit('transactionList', res);
         //console.log('res',res)
         if (res && res.length > 0) {
@@ -913,8 +913,8 @@ async function requestTransactionHistory() {
     //     return;
     // }
     // await light.updateHistory(addresses);
-    let wallet = require("./wallet");
-    wallet.getWallets(function (res) {
+    let wallets = require('./wallet.js');
+    wallets.getWallets(function (res) {
         //eventBus.emit('transactionList', res);
         if (res && res.length > 0) {
             let len = res.length;

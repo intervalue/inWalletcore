@@ -166,7 +166,7 @@ var light = require("./light");
  * @param cb
  * @returns {*}
  */
-exports.getTradingUnit = function (opts ,cb) {
+exports.getTradingUnit = async function (opts ,cb) {
 
     /**
      * 计算费用
@@ -202,7 +202,7 @@ exports.getTradingUnit = function (opts ,cb) {
     var timestamp = Math.round(Date.now());
     let Base64 = require('./base64Code');
     let noteBase64 = opts.note ?  Base64.encode(opts.note) :'';
-    let NRG_PRICE = hashnethelper.getNRGPrice();
+    let NRG_PRICE = await hashnethelper.getNRGPrice();
 
     switch(typeof opts) {
         case "string":
