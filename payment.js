@@ -15,6 +15,7 @@ var light = require('./light.js');
 const config = require('./conf.js')
 const zero = '000000000000000000';
 var mutex = require('./mutex.js');
+var Decimal = require('decimal.js');
 /**
  * 获取NRG_PRICE
  * @returns {number}
@@ -57,7 +58,6 @@ async function transactionMessage(data,cb) {
         let Base64 = require('./base64Code');
         let noteBase64 = data.note ?  Base64.encode(data.note) :'';
         let fee = noteBase64 ? ((noteBase64.length * 1.0 /1024) * constants.NRG_PEER_KBYTE + constants.BASE_NRG).toString(): constants.BASE_NRG.toString();
-        var Decimal = require('decimal.js');
         let stablesFrom = await light.findStable3(data.fromAddress);
         let stablesTo = new Decimal(stablesFrom).sub(data.amount).sub(new Decimal(fee*NRG_PRICE/1000000000000000000)).toString();
         let compareStables = new Decimal(stablesTo) >0
@@ -135,24 +135,33 @@ async function contractTransactionData(opts,cb) {
     var Bitcore = require('bitcore-lib');
     NRG_PRICE = await getNrgPrice();
     if (!NRG_PRICE) return cb(('error,unable to get nrgPrice'), null);
+    let stablesFrom = await light.findStable3(opts.fromAddress);
+    //let stablesFrom = stable[0].amount + stable[0].amount_point / parseInt(1 + zero) - stable[0].fee - stable[0].fee_point / parseInt(1 + zero);
+    let stablesTo = new Decimal(stablesFrom).sub(opts.amount).sub(new Decimal(0.0005*NRG_PRICE / 1000000000000000000)).toString();
+    let compareStables = new Decimal(stablesTo) >0
+    if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
+        return cb("not enough spendable funds from " + opts.toAddress + " for " + (parseInt(opts.fee) + parseInt(opts.amount)));
+    }
     let amount = (opts.amount + "").split('.')[0];
     let amountP = (opts.amount + "").split('.')[1] ? (opts.amount + "").split('.')[1] : '';
     // let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
     let amountstr = (amount+amountP).replace(/\b(0+)/gi,"")+zero.substring(-1,zero.length-amountP.length);
-    try {
+    let gas = new Decimal(constants.BASE_NRG).times(NRG_PRICE).toFixed();
+
+    try{
         let info = await hashnethelper.getAccountInfo(opts.fromAddress);
         let nonce = info.nonce;
         let callData = opts.callData;
-        let gasPrice = NRG_PRICE+"";
+        let gasPrice = NRG_PRICE;
         let value = amountstr;
-        let gasLimit = constants.BASE_NRG+"";
+        let gasLimit = constants.BASE_NRG;
         let toAddress = opts.toAddress;
         let data ={
-            nonce: nonce,
+            nonce: nonce+"",
             callData: "3a93424a0000000000000000000000000000000"+callData,
-            gasPrice: gasPrice,
-            value: value,
-            gasLimit: gasLimit,
+            gasPrice: gasPrice.toString(),
+            value: value.toString(),
+            gasLimit: gasLimit.toString(),
             toAddress: toAddress
         }
         data = formatToBase64(data);
@@ -160,6 +169,7 @@ async function contractTransactionData(opts,cb) {
                 fromAddress: opts.fromAddress,
                 timestamp: Math.round(Date.now()),
                 data: data,
+                //data: new Buffer(JSON.stringify(data)).toString("base64"),
                 vers: transationVersion,
                 pubkey: opts.pubkey,
                 type: 2
@@ -170,7 +180,7 @@ async function contractTransactionData(opts,cb) {
         let privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size: 32});
         let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
         obj.signature = signature;
-
+       console.log(JSON.stringify(obj))
         cb(null, obj);
     } catch (e) {
         cb(e.toString());
@@ -195,7 +205,6 @@ async function sendTransactions(opts, cb){
         let localfullnode =urlList[Math.round(Math.random() * urlList.length)];
         localfullnode = config.TRANSACTION_URL;
         let message = JSON.stringify(opts);
-        console.log(buildData({message}))
         let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message})));
         if (resultMessage.code != 200) {
             //如果发送失败，则马上返回到界面
@@ -290,11 +299,11 @@ let buildData = (data) => {
 }
 
 let formatToBase64 =(data) =>{
-    let m ={};
-    for(let i in data){
-        m[i] = new Buffer(data[i]).toString("base64");
-    }
-    return new Buffer(JSON.stringify(m)).toString("base64")
+    // let m ={};
+    // for(let i in data){
+    //     m[i] = new Buffer(data[i]).toString("base64");
+    // }
+    return new Buffer(JSON.stringify(data)).toString("base64")
 
 }
 
