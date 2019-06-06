@@ -155,16 +155,17 @@ async function contractTransactionData(opts,cb) {
         let gasPrice = NRG_PRICE;
         let value = amountstr;
         let gasLimit = constants.BASE_NRG;
+        //let gasLimit = 2000000;
         let toAddress = opts.toAddress;
         let data ={
-            nonce: nonce+"",
-            callData: "3a93424a0000000000000000000000000000000"+callData,
-            gasPrice: gasPrice.toString(),
-            value: value.toString(),
-            gasLimit: gasLimit.toString(),
-            toAddress: toAddress
+            nonce: numberToBase64(Number(nonce)),
+            callData: stringToBase64("3a93424a0000000000000000000000000000000"+callData),
+            gasPrice: numberToBase64(Number(gasPrice)),
+            value: numberToBase64(Number(value)),
+            gasLimit: numberToBase64(Number(gasLimit)),
+            toAddress: stringToBase64(toAddress)
         }
-        data = formatToBase64(data);
+        data = stringToBase64(JSON.stringify(data));
         let obj = {
                 fromAddress: opts.fromAddress,
                 timestamp: Math.round(Date.now()),
@@ -205,6 +206,7 @@ async function sendTransactions(opts, cb){
         let localfullnode =urlList[Math.round(Math.random() * urlList.length)];
         localfullnode = config.TRANSACTION_URL;
         let message = JSON.stringify(opts);
+        console.log(buildData({message}))
         let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message})));
         if (resultMessage.code != 200) {
             //如果发送失败，则马上返回到界面
@@ -246,6 +248,7 @@ function sendTransactionToOtherServer(data, cb){
                 return cb(err, null);
             }
             else{
+                inserTrans(data.paybody.message);
                 cb(null, res);
             }
         });
@@ -298,14 +301,15 @@ let buildData = (data) => {
     return JSON.parse(JSON.stringify(data));
 }
 
-let formatToBase64 =(data) =>{
-    // let m ={};
-    // for(let i in data){
-    //     m[i] = new Buffer(data[i]).toString("base64");
-    // }
-    return new Buffer(JSON.stringify(data)).toString("base64")
-
+let stringToBase64 =(data) =>{
+    return new Buffer(data).toString("base64")
 }
+let numberToBase64 =(data) =>{
+    let k = data.toString(16);
+    k = k.length % 2 ==1 ? "0"+k : k;
+    return Buffer.from(k,'hex').toString("base64")
+}
+
 
 module.exports = {
     transactionMessage: transactionMessage,
