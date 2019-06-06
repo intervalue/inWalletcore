@@ -181,7 +181,6 @@ async function contractTransactionData(opts,cb) {
         let privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size: 32});
         let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
         obj.signature = signature;
-       console.log(JSON.stringify(obj))
         cb(null, obj);
     } catch (e) {
         cb(e.toString());
@@ -206,13 +205,12 @@ async function sendTransactions(opts, cb){
         let localfullnode =urlList[Math.round(Math.random() * urlList.length)];
         localfullnode = config.TRANSACTION_URL;
         let message = JSON.stringify(opts);
-        console.log(buildData({message}))
         let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message})));
         if (resultMessage.code != 200) {
             //如果发送失败，则马上返回到界面
-            await inserTrans(opts)
             cb(resultMessage.data, null);
         }else {
+            await inserTrans(opts)
             cb(null,resultMessage)
         }
     }catch (e) {
