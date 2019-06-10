@@ -137,13 +137,13 @@ async function contractTransactionData(opts,cb) {
     var Bitcore = require('bitcore-lib');
     NRG_PRICE = await getNrgPrice();
     if (!NRG_PRICE) return cb(('error,unable to get nrgPrice'), null);
-    // let stablesFrom = await light.findStable3(opts.fromAddress);
-    // //let stablesFrom = stable[0].amount + stable[0].amount_point / parseInt(1 + zero) - stable[0].fee - stable[0].fee_point / parseInt(1 + zero);
-    // let stablesTo = new Decimal(stablesFrom).sub(opts.amount).sub(new Decimal(0.0005*NRG_PRICE / 1000000000000000000)).toString();
-    // let compareStables = new Decimal(stablesTo) >0
-    // if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
-    //     return cb("not enough spendable funds from " + opts.toAddress + " for " + (parseInt(opts.fee ? opts.fee : 0) + parseInt(opts.amount)));
-    // }
+    let stablesFrom = await light.findStable3(opts.fromAddress);
+    //let stablesFrom = stable[0].amount + stable[0].amount_point / parseInt(1 + zero) - stable[0].fee - stable[0].fee_point / parseInt(1 + zero);
+    let stablesTo = new Decimal(stablesFrom).sub(opts.amount).sub(new Decimal(0.0005*NRG_PRICE / 1000000000000000000)).toString();
+    let compareStables = new Decimal(stablesTo) >0
+    if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
+        return cb("not enough spendable funds from " + opts.toAddress + " for " + (parseInt(opts.fee ? opts.fee : 0) + parseInt(opts.amount)));
+    }
     let amount = (opts.amount + "").split('.')[0];
     let amountP = (opts.amount + "").split('.')[1] ? (opts.amount + "").split('.')[1] : '';
     // let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
