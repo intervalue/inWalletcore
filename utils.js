@@ -74,10 +74,52 @@ let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
  return signature;
 }
 
+/**
+ * 字符串转base64
+ * @param data
+ * @returns {string}
+ */
+let stringToBase64 =(data) =>{
+    return new Buffer(data).toString("base64")
+}
+
+/**
+ * 数字转base64
+ * @param data
+ * @returns {*}
+ */
+let numberToBase64 =(data) =>{
+    let k = data.toString(16);
+    k = k.length % 2 ==1 ? "0"+k : k;
+    return Buffer.from(k,'hex').toString("base64")
+}
+
+/**
+ * base转字符串
+ * @param data
+ */
+let base64ToString =(data) => {
+    return  Buffer.from(data,"base64").toString();
+
+}
+
+/**
+ * base64转数字
+ * @param data
+ */
+let base64ToNumber =(data) => {
+    let b = Buffer.from(data,"base64").toString("hex");
+    return parseInt(b,16);
+}
+
 
 
 module.exports = {
     getprivKey: getprivKey,
     getPubkey: getPubkey,
+    stringToBase64: stringToBase64,
+    numberToBase64: numberToBase64,
+    base64ToString: base64ToString,
+    base64ToNumber: base64ToNumber,
     signature: signature
 };

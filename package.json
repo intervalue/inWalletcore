@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "ava": "^0.22.0",
-    "testcheck": "^1.0.0-rc.2"
+    "testcheck": "^1.0.0-rc.2",
+    "node-bitcoin-rpc": "^1.1.3"
   }
 }

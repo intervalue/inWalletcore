@@ -45,7 +45,7 @@ exports.MAX_TOLERATED_INVALID_RATIO = 0.1; // max tolerated ratio of invalid to 
 exports.MIN_COUNT_GOOD_PEERS = 10; // if we have less than this number of good peers, we'll ask peers for their lists of peers
 
 exports.bWantNewPeers = true;
-exports.TRANSACTION_URL = "localtoexp.inve.one:33790";
+exports.TRANSACTION_URL = "172.17.2.118:35793";
 
 // true, when removed_paired_device commands received from peers are to be ignored. Default is false.
 exports.bIgnoreUnpairRequests = false;
