@@ -262,8 +262,6 @@ function sendTransactionToOtherServer(data, cb){
 }
 
 let inserTrans = async (obj) => {
-    console.log('insertobjs:  ',obj)
-    console.log('key:  ',obj.hasOwnProperty("data"));
     if(obj.hasOwnProperty("data")){
         let b = JSON.parse(new Buffer(obj.data,"base64").toString());
         obj.amount = utils.base64ToNumber(b.value).toString();

@@ -3,6 +3,7 @@
 
 var async = require('async');
 var db = require('./db.js');
+var utils = require('./utils.js');
 var mutex = require('./mutex.js');
 var eventBus = require('./event_bus.js');
 var device = require('./device.js');
@@ -1415,11 +1416,19 @@ function getCoinType(type, callback) {
 //新增一条交易记录
 async function insertTran(tran, data) {
     console.log("\nsaving unit:");
+
     try{
         // console.log(JSON.stringify(tran));
         let updateTime = tran.updateTime;
         let obj = tran;
         tran = JSON.parse(tran.message);
+        if(tran.hasOwnProperty("data")){
+            let b = JSON.parse(new Buffer(tran.data,"base64").toString());
+            tran.amount = utils.base64ToNumber(b.value).toString();
+            tran.fee = utils.base64ToNumber(b.gasLimit);
+            tran.toAddress = utils.base64ToString(b.toAddress);
+            tran.nrgPrice = utils.base64ToNumber(b.gasPrice)
+        }
         let amount = tran.amount;
         let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
         let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
