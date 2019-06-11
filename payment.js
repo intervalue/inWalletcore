@@ -247,11 +247,17 @@ function sendTransactionToOtherServer(data, cb){
             }
         webHelper.httpPost(url, header, obj, function (err, res) {
             if(err){
-                return cb(err, null);
+                return cb(err);
             }
             else{
-                inserTrans(data.paybody.message);
-                cb(null, res);
+                res = JSON.parse(res);
+                if(res.errorcode =="0"){
+                    inserTrans(data.paybody.message);
+                     cb(null, res);
+                }else {
+                     cb(res.errormsg);
+                }
+
             }
         });
 
