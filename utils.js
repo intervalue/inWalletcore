@@ -4,6 +4,7 @@ var Bitcore = require('bitcore-lib');
 var Mnemonic = require('bitcore-mnemonic');
 var objectHash = require('./object_hash.js');
 var ecdsaSig = require('./signature.js');
+var Decimal = require('decimal.js');
 //let words = 'shield salmon sport horse cool hole pool panda embark wrap fancy equip'
 //let words = 'silent lava disease visa liquid champion finish curtain alarm spy picnic become'//商户
 //let address = '6GTHF7OFAGTZ6HS6KHLD44HDUC6XCJMG'//商户
@@ -89,7 +90,8 @@ let stringToBase64 =(data) =>{
  * @returns {*}
  */
 let numberToBase64 =(data) =>{
-    let k = data.toString(16);
+    let n = new Decimal(data);
+    let k = n.toNumber().toString(16);
     k = k.length % 2 ==1 ? "0"+k : k;
     return Buffer.from(k,'hex').toString("base64")
 }
@@ -108,8 +110,8 @@ let base64ToString =(data) => {
  * @param data
  */
 let base64ToNumber =(data) => {
-    let b = Buffer.from(data,"base64").toString("hex");
-    return parseInt(b,16);
+    let b = Buffer.from(data, "base64").toString("hex");
+    return new Decimal(parseInt(b, 16)).sub('0').toFixed();
 }
 
 

@@ -148,7 +148,7 @@ async function contractTransactionData(opts,cb) {
     let amountP = (opts.amount + "").split('.')[1] ? (opts.amount + "").split('.')[1] : '';
     // let amountPoint = amountP+zero.substring(-1,zero.length-amountP.length);
     let amountstr = (amount+amountP).replace(/\b(0+)/gi,"")+zero.substring(-1,zero.length-amountP.length);
-    let gas = new Decimal(constants.BASE_NRG).times(NRG_PRICE).toFixed();
+    // let gas = new Decimal(constants.BASE_NRG).times(NRG_PRICE).toFixed();
 
     try{
         let info = await hashnethelper.getAccountInfo(opts.fromAddress);
@@ -160,11 +160,11 @@ async function contractTransactionData(opts,cb) {
         //let gasLimit = 2000000;
         let toAddress = opts.toAddress;
         let data ={
-            nonce: utils.numberToBase64(Number(nonce)),
+            nonce: utils.numberToBase64(nonce),
             callData: utils.stringToBase64("3a93424a0000000000000000000000000000000"+callData),
-            gasPrice: utils.numberToBase64(Number(gasPrice)),
-            value: utils.numberToBase64(Number(value)),
-            gasLimit: utils.numberToBase64(Number(gasLimit)),
+            gasPrice: utils.numberToBase64(gasPrice),
+            value: utils.numberToBase64(value),
+            gasLimit: utils.numberToBase64(gasLimit),
             toAddress: utils.stringToBase64(toAddress)
         }
         data = utils.stringToBase64(JSON.stringify(data));
