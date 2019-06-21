@@ -30,7 +30,7 @@ function getprivKey(words) {
     var xPubkey = Bitcore.HDPublicKey(privateKey2).xpubkey;
     var path = "m/0/0";
     var pubkey = derivePubkey(xPubkey, path); //扩展公钥，用于验证签名
-    var arrDefinition = ["sig", { "pubkey": pubkey }];
+    var arrDefinition = ["sig", {"pubkey": pubkey}];
     var address = objectHash.getChash160(arrDefinition);
 
     var obj = {
@@ -48,31 +48,33 @@ function getPubkey(xprivKey) {
     var privateKey2 = xPrivKey.derive(path2);
     var xPubkey = Bitcore.HDPublicKey(privateKey2).xpubkey;
     var path = "m/0/0";
+
     function derivePubkey(xPubKey, path) {
         var hdPubKey = new Bitcore.HDPublicKey(xPubKey);
         return hdPubKey.derive(path).publicKey.toBuffer().toString("base64");
     }
+
     var pubkey = derivePubkey(xPubkey, path); //扩展公钥，用于验证签名
     return pubkey;
 }
 
-function signature(msg, xprivKey){
+function signature(msg, xprivKey) {
 
-var obj= {
-    msg:msg
-}
+    var obj = {
+        msg: msg
+    }
 
 
-var buf_to_sign = objectHash.getUnitHashToSign(obj);
+    var buf_to_sign = objectHash.getUnitHashToSign(obj);
 
-var xPrivKey = new Bitcore.HDPrivateKey.fromString(xprivKey);
+    var xPrivKey = new Bitcore.HDPrivateKey.fromString(xprivKey);
 //获取签名的私钥
-var pathSign = "m/44'/0'/0'/0/0";
-var privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size:32});
+    var pathSign = "m/44'/0'/0'/0/0";
+    var privKeyBuf = xPrivKey.derive(pathSign).privateKey.bn.toBuffer({size: 32});
 
-let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
+    let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
 //对签名进行验证
- return signature;
+    return signature;
 }
 
 /**
@@ -80,7 +82,7 @@ let signature = ecdsaSig.sign(buf_to_sign, privKeyBuf);
  * @param data
  * @returns {string}
  */
-let stringToBase64 =(data) =>{
+let stringToBase64 = (data) => {
     return new Buffer(data).toString("base64")
 }
 
@@ -89,19 +91,19 @@ let stringToBase64 =(data) =>{
  * @param data
  * @returns {*}
  */
-let numberToBase64 =(data) =>{
+let numberToBase64 = (data) => {
     let n = new Decimal(data);
     let k = n.toNumber().toString(16);
-    k = k.length % 2 ==1 ? "0"+k : k;
-    return Buffer.from(k,'hex').toString("base64")
+    k = k.length % 2 == 1 ? "0" + k : k;
+    return Buffer.from(k, 'hex').toString("base64")
 }
 
 /**
  * base转字符串
  * @param data
  */
-let base64ToString =(data) => {
-    return  Buffer.from(data,"base64").toString();
+let base64ToString = (data) => {
+    return Buffer.from(data, "base64").toString();
 
 }
 
@@ -109,11 +111,10 @@ let base64ToString =(data) => {
  * base64转数字
  * @param data
  */
-let base64ToNumber =(data) => {
+let base64ToNumber = (data) => {
     let b = Buffer.from(data, "base64").toString("hex");
     return new Decimal(parseInt(b, 16)).sub('0').toFixed();
 }
-
 
 
 module.exports = {

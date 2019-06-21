@@ -132,18 +132,17 @@ class HashnetHelper {
     //直接调用共识网的发送交易接口
     static async sendMessageTry(unit) {
         try {
-            //获取局部全节点
-            let address = unit.fromAddress
-            let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
-
-            if (!localfullnode) {
-                throw new Error('network error, please try again.');
-            }
+            // //获取局部全节点
+            // let address = unit.fromAddress
+            // let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
+            //
+            // if (!localfullnode) {
+            //     throw new Error('network error, please try again.');
+            // }
             console.log("sending unit:");
             let message = JSON.stringify(unit);
             //往共识网发送交易
-            localfullnode = config.TRANSACTION_URL;
-            let result = await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message}));
+            let result = await webHelper.httpPost(getUrl(config.TRANSACTION_URL, '/v1/sendmsg'), null, buildData({message}));
             // if(JSON.parse(result).code != 200 && JSON.parse(result).data.match(/sender is illegal/g)) {
             //     await sendMessageTry(unit)
             //     return
@@ -160,7 +159,7 @@ class HashnetHelper {
 
     static async getTransactionHistory(address, tableIndex, offset) {
         //获取局部全节点
-        let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
+       // let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
 
         let rows = await db.execute("SELECT ti.tableIndex ,ti.offsets FROM transactions_index ti WHERE ti.address = ?", address);
 
@@ -177,14 +176,13 @@ class HashnetHelper {
         }
 
         try {
-            if (!localfullnode) {
-                throw new Error('network error, please try again.');
-            }
+            // if (!localfullnode) {
+            //     throw new Error('network error, please try again.');
+            // }
 
-            localfullnode = config.TRANSACTION_getURL;
             let type = [1, 2];
             //从共识网拉取交易记录
-            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/gettransactionlist'), null, buildData({
+            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
                 address,
                 tableIndex,
                 offset,
@@ -217,9 +215,9 @@ class HashnetHelper {
             // return result ? JSON.parse(result) : [];
         } catch (e) {
             //处理失效的局部全节点
-            if (localfullnode) {
-                await HashnetHelper.reloadLocalfullnode(localfullnode);
-            }
+            // if (localfullnode) {
+            //     await HashnetHelper.reloadLocalfullnode(localfullnode);
+            // }
             return {result: [], tableIndex, offset, address};
         }
     }
@@ -231,20 +229,20 @@ class HashnetHelper {
      */
     static async getHashInfo(hash) {
 
-        let localfullnode = await HashnetHelper.buildSingleLocalfullnode();
-        localfullnode = config.TRANSACTION_getURL;
+        // let localfullnode = await HashnetHelper.buildSingleLocalfullnode();
+        // localfullnode = config.TRANSACTION_getURL;
         try {
-            if (!localfullnode) {
-                throw new Error('network error, please try again.');
-            }
-            let result = await webHelper.httpPost(getUrl(localfullnode, '/v1/gettransaction'), null, buildData({hash}));
+            // if (!localfullnode) {
+            //     throw new Error('network error, please try again.');
+            // }
+            let result = await webHelper.httpPost(getUrl(config.TRANSACTION_getURL, '/v1/gettransaction'), null, buildData({hash}));
             return result ? JSON.parse(result) : null;
         }
         catch (e) {
             //处理失效的局部全节点
-            if (localfullnode) {
-                await HashnetHelper.reloadLocalfullnode(localfullnode);
-            }
+            // if (localfullnode) {
+            //     await HashnetHelper.reloadLocalfullnode(localfullnode);
+            // }
             return null;
         }
     }
