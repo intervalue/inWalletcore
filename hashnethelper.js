@@ -181,7 +181,7 @@ class HashnetHelper {
                 throw new Error('network error, please try again.');
             }
 
-            localfullnode = config.TRANSACTION_URL;
+            localfullnode = config.TRANSACTION_getURL;
             let type = [1, 2];
             //从共识网拉取交易记录
             let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/gettransactionlist'), null, buildData({
@@ -232,7 +232,7 @@ class HashnetHelper {
     static async getHashInfo(hash) {
 
         let localfullnode = await HashnetHelper.buildSingleLocalfullnode();
-        localfullnode = config.TRANSACTION_URL;
+        localfullnode = config.TRANSACTION_getURL;
         try {
             if (!localfullnode) {
                 throw new Error('network error, please try again.');
@@ -278,7 +278,7 @@ class HashnetHelper {
      */
     static async getAccountInfo (address) {
 
-        let localfullnode = config.TRANSACTION_URL;
+        let localfullnode = config.TRANSACTION_getURL;
 
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/account/info'), null, {address:address}));

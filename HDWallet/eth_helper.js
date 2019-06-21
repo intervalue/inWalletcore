@@ -18,8 +18,8 @@ if (typeof web3 !== 'undefined') {
     web3 = new Web3(web3.currentProvider);
 } else {
     // set the provider you want from Web3.providers
-    // var web3 = new Web3(new Web3.providers.HttpProvider("http://13.125.253.106:8080"));
-    web3 = new Web3(new Web3.providers.HttpProvider("http://13.125.253.106:8181"));
+    // var web3 = new Web3(new Web3.providers.HttpProvider("http://52.221.119.220:8080"));
+    web3 = new Web3(new Web3.providers.HttpProvider("http://52.221.119.220:8181"));
 }
 var Tx = require('ethereumjs-tx');
 
