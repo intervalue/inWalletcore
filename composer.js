@@ -65,6 +65,7 @@ async function writeTran(params, handleResult) {
         let feeTotal;
         var isHot = params.name;
         let zero = '000000000000000000';
+        NRG_PRICE = await hashnethelper.getNRGPrice();
         if(!NRG_PRICE) return handleResult('unable to get nrgPrice');
         /**
          * 计算费用

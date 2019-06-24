@@ -21,7 +21,7 @@ if (typeof web3 !== 'undefined') {
 } else {
     // set the provider you want from Web3.providers
     // var web3 = new Web3(new Web3.providers.HttpProvider("http://52.221.119.220:8080"));
-    var web3 = new Web3(new Web3.providers.HttpProvider("http://52.221.119.220:8181"));
+    var web3 = new Web3(new Web3.providers.HttpProvider("http://eth.inve.one:8181"));
 }
 var Tx = require('ethereumjs-tx');
 

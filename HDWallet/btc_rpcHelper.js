@@ -2,7 +2,7 @@
 
 const RPC_USERNAME = 'test';
 const RPC_PASSWORD = 'test';
-const RPC_HOST = "52.221.119.220";
+const RPC_HOST = "btcrpc.inve.one";
 const RPC_PORT = 8332;
 
 var bitcoin_rpc = require('node-bitcoin-rpc');
@@ -88,7 +88,7 @@ function listUnSpent(address, callback){
 
 
 function getUnspentByThird (address, callback){
-    var url = "http://52.221.119.220:3002/insight-api/addrs/" + address +"/utxo";
+    var url = "http://btcapi.inve.one:3002/insight-api/addrs/" + address +"/utxo";
     var options = {
         method: 'get',
         url: url,
@@ -285,7 +285,7 @@ function getTransactions(address, callbackFun, rescan, now){
     getIndex('BTC*' + address, function(err, page, pageNum){
         if (pageNum - page > 50)
             pageNum = page + 50;
-        var url = "http://52.221.119.220:3002/insight-api/addrs/" + address +"/txs?from=" + page + "&to=" + pageNum;
+        var url = "http://btcapi.inve.one:3002/insight-api/addrs/" + address +"/txs?from=" + page + "&to=" + pageNum;
         var options = {
             method: 'get',
             url: url,
@@ -313,7 +313,7 @@ function getTransactions(address, callbackFun, rescan, now){
 }
 
 function importMyAddress(address, callbackFun){
-    var url = "http://52.221.119.220:3002/insight-api/addrs/" + address +"/txs?from=0&to=1";
+    var url = "http://btcapi.inve.one:3002/insight-api/addrs/" + address +"/txs?from=0&to=1";
     var options = {
         method: 'get',
         url: url,
@@ -337,7 +337,7 @@ function importMyAddress(address, callbackFun){
                 importAddress(address, address, callbackFun, true, 'now');
                 return;
             }
-            var url2 = "http://52.221.119.220:3002/insight-api/addrs/" + address +"/txs?from=" + (num - 1) + "&to=" + num;
+            var url2 = "http://btcapi.inve.one:3002/insight-api/addrs/" + address +"/txs?from=" + (num - 1) + "&to=" + num;
             var options2 = {
                 method: 'get',
                 url: url2,

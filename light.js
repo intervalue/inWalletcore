@@ -259,6 +259,7 @@ async function updateHistory(addresses) {
                     eventBus.emit('newtransaction', tran);
                 } else {
                     await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, data.offset, data.address);
+                    eventBus.emit('newtransaction', tran);
                 }
             }
             // }
