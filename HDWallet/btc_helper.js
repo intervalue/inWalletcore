@@ -6,7 +6,7 @@ const bip32 = bitcoin.bip32;
 const ecpair = bitcoin.ECPair;
 const network = bitcoin.networks.testnet
 const network2 = bitcoin.networks.bitcoin
-const BigNumber = require('bignumber.js');
+const BigNumber = require('decimal.js');
 const crypto = bitcoin.crypto;
 /**
  * #TODO import from privateKEY

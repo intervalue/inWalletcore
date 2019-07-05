@@ -890,7 +890,8 @@ async function requestOtherTransactionHistory(){
             /**
              * 增加其他币种的历史记录查询
              */
-            light.updateOtherHistory(otherObject, otherArr);
+                light.updateOtherHistory(otherObject, otherArr);
+
 
             //light.updateHistory(arr);
         }
@@ -913,6 +914,7 @@ async function requestTransactionHistory() {
     //     return;
     // }
     // await light.updateHistory(addresses);
+    let time = Math.round(Date.now())/1000;
     let wallets = require('./wallet.js');
     wallets.getWallets(function (res) {
         //eventBus.emit('transactionList', res);
@@ -944,6 +946,51 @@ async function requestTransactionHistory() {
             //light.updateOtherHistory(otherObject, otherArr);
 
             light.updateHistory(arr);
+
+
+
+            //light.updateMultiTrans(all, allAddress);
+
+        }
+    });
+}
+
+async function requestTransactionHistoryMulti() {
+    // let { addresses } = await device.getInfo();
+    // if (addresses.length == 0) {
+    //     return;
+    // }
+    // await light.updateHistory(addresses);
+    let time = Math.round(Date.now())/1000;
+    let wallets = require('./wallet.js');
+    wallets.getWallets(function (res) {
+        //eventBus.emit('transactionList', res);
+        if (res && res.length > 0) {
+            let len = res.length;
+            let arr = [];
+            //let otherObject = [];
+            //let otherArr = [];
+            let snc = [];
+            let all = [];
+            let allAddress = [];
+            for (let i = 0; i < len; i++) {
+                let obj = {};
+                let walletStr = res[i].wallet;
+                let addrss = res[i].address;
+                obj['address'] = addrss;
+                obj['walletId'] = walletStr;
+                all.push(obj);
+                allAddress.push(res[i].address);
+                if (res[i].wallet.indexOf('BTC-') > -1 || res[i].wallet.indexOf('ETH-') > -1) {
+                    //otherArr.push(res[i].address);
+                    //otherObject.push({ 'address': res[i].address, 'type': res[i].wallet.split('-')[0] });
+                    continue;
+                }else arr.push(res[i].address);
+            }
+            /**
+             * 增加其他币种的历史记录查询
+             */
+            //light.updateOtherHistory(otherObject, otherArr);
 
             light.updateMultiTrans(all, allAddress);
 
@@ -1017,8 +1064,9 @@ function initWitnessesIfNecessary(ws, onDone) {
  */
 function startLightClient() {
     wss = { clients: [] };
-    setInterval(requestTransactionHistory, 5 * 1000);
-    setInterval(requestOtherTransactionHistory, 9 * 1000);
+    setInterval( requestTransactionHistory, 5 * 1000);
+    setInterval(requestOtherTransactionHistory, 34 * 1000);
+    setInterval(requestTransactionHistoryMulti,  60 * 1000);
     //setInterval(requestUpdateETH, 60 * 1000 * 10);
 }
 

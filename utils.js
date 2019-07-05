@@ -58,14 +58,8 @@ function getPubkey(xprivKey) {
     return pubkey;
 }
 
-function signature(msg, xprivKey) {
-
-    var obj = {
-        msg: msg
-    }
-
-
-    var buf_to_sign = objectHash.getUnitHashToSign(obj);
+function signature(opts, xprivKey) {
+    var buf_to_sign = objectHash.getUnitHashToSign(opts);
 
     var xPrivKey = new Bitcore.HDPrivateKey.fromString(xprivKey);
 //获取签名的私钥
@@ -116,6 +110,23 @@ let base64ToNumber = (data) => {
     return new Decimal(parseInt(b, 16)).sub('0').toFixed();
 }
 
+let Hexstring2btye = (str)=> {
+    let pos = 0;
+    let len = str.length;
+    if (len % 2 != 0) {
+        return null;
+    }
+    len /= 2;
+    let hexA = new Array();
+    for (let i = 0; i < len; i++) {
+        let s = str.substr(pos, 2);
+        let v = parseInt(s, 16);
+        hexA.push(v);
+        pos += 2;
+    }
+    return hexA;
+}
+
 
 module.exports = {
     getprivKey: getprivKey,
@@ -124,5 +135,6 @@ module.exports = {
     numberToBase64: numberToBase64,
     base64ToString: base64ToString,
     base64ToNumber: base64ToNumber,
-    signature: signature
+    signature: signature,
+    Hexstring2btye: Hexstring2btye
 };

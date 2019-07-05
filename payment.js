@@ -161,12 +161,14 @@ async function contractTransactionData(opts,cb) {
         let toAddress = opts.toAddress;
         let data ={
             nonce: utils.numberToBase64(nonce),
-            callData: utils.stringToBase64("3a93424a0000000000000000000000000000000"+callData),
+            //callData: utils.stringToBase64("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData),
+            callData: utils.stringToBase64(utils.Hexstring2btye("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData)),
             gasPrice: utils.numberToBase64(gasPrice),
             value: utils.numberToBase64(value),
             gasLimit: utils.numberToBase64(gasLimit),
             toAddress: utils.stringToBase64(toAddress)
         }
+        console.log("data.callData: ",data.callData)
         data = utils.stringToBase64(JSON.stringify(data));
         let obj = {
                 fromAddress: opts.fromAddress,

@@ -181,7 +181,7 @@ async function writeTran(params, handleResult) {
 
         if(params.getHash){
             delete obj.findAddressForJoint;
-            handleResult(signature,obj);
+            handleResult(null,signature,obj);
             return;
         }
 

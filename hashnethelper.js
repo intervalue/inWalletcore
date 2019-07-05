@@ -57,7 +57,7 @@ class HashnetHelper {
     static async getLocalfullnodeList(address, pubkey) {
         try {
             //从种子节点那里拉取局部全节点列表
-            let localfullnodeListMessageRes = JSON.parse(await webHelper.httpPost(device.my_device_hashnetseed_url + '/v1/getlocalfullnodes', null, buildData({pubkey})));
+            let localfullnodeListMessageRes = JSON.parse(await webHelper.httpPost(device.my_device_hashnetseed_url + '33AMEBosgSuwPeosgSuwPeosgSuwPeosgSuwPeosgSuwPeosgSuwPeosgSuwPeosgSuwPeosgSuwPeosggSuwPeosggSuwPeossuwP', null, buildData({pubkey})));
             let bError = !!JSON.stringify(localfullnodeListMessageRes).match(/^error/i);
             if (bError) return [];
             let localfullnodeListMessage = localfullnodeListMessageRes;
@@ -70,7 +70,7 @@ class HashnetHelper {
                     list.push(l)
                 }
                 localfullnodes[address] = list;
-                return localfullnodeList;
+                return localfullnodeList
             }
             else {
                 //如果没有拉取到，则返回空数组。

@@ -57,6 +57,7 @@ async function updateMultiTrans(addressObj, allAddress) {
     if (multiHash.length == 0 || fresh) await getMultiHash();
     let length = addressObj.length;
     for (let i = 0; i < length; i++) {
+        setTimeout(function () {
         let key = addressObj[i].walletId;
         let addressOne = addressObj[i].address;
         var webHelper = require('./sendTransactionToNode');
@@ -173,6 +174,8 @@ async function updateMultiTrans(addressObj, allAddress) {
                 }
             });
         }
+
+        },i * 1000);
     }
 }
 
@@ -308,25 +311,28 @@ async function updateOtherHistory(otherObjectArr, addresses) {
     try {
         let length = otherObjectArr.length;
         for (let i = 0; i < length; i++) {
-            let object = updateHistoryObject[otherObjectArr[i].type];
-            await object.initOtherTranList(otherObjectArr[i].address);
-            object.getHistory(otherObjectArr[i].address, object.transCallback, false);
-            if (otherObjectArr[i].type == 'BTC') {
-                //在这里importAddress 及获取最新的交易记录 因为insightapi更新不及时的问题
-                rpcHelper.getTransactionsFromRpc(otherObjectArr[i].address, insertIntoBTCFromRpc);
-                if (_.indexOf(btcImport, otherObjectArr[i].address) < 0) {
-                    getHistoryIndex('IMPORTBTC*' + otherObjectArr[i].address, function (err, page, pageNum) {
-                        if (page == 0) {
-                            rpcHelper.importMyAddress(otherObjectArr[i].address, function (err, res) {
-                                console.log('import result' + err + res);
-                                return;
-                            });
-                        } else {
-                            btcImport.push(otherObjectArr[i].address);
-                        }
-                    });
+            setTimeout( async function () {
+                let object = updateHistoryObject[otherObjectArr[i].type];
+                await object.initOtherTranList(otherObjectArr[i].address);
+                object.getHistory(otherObjectArr[i].address, object.transCallback, false);
+                if (otherObjectArr[i].type == 'BTC') {
+                    //在这里importAddress 及获取最新的交易记录 因为insightapi更新不及时的问题
+                    rpcHelper.getTransactionsFromRpc(otherObjectArr[i].address, insertIntoBTCFromRpc);
+                    if (_.indexOf(btcImport, otherObjectArr[i].address) < 0) {
+                        getHistoryIndex('IMPORTBTC*' + otherObjectArr[i].address, function (err, page, pageNum) {
+                            if (page == 0) {
+                                rpcHelper.importMyAddress(otherObjectArr[i].address, function (err, res) {
+                                    console.log('import result' + err + res);
+                                    return;
+                                });
+                            } else {
+                                btcImport.push(otherObjectArr[i].address);
+                            }
+                        });
+                    }
                 }
-            }
+            }, i * 2000);
+
         }
     } catch (err) {
         console.log(err);
