@@ -45,11 +45,6 @@ exports.MAX_TOLERATED_INVALID_RATIO = 0.1; // max tolerated ratio of invalid to 
 exports.MIN_COUNT_GOOD_PEERS = 10; // if we have less than this number of good peers, we'll ask peers for their lists of peers
 
 exports.bWantNewPeers = true;
-//exports.TRANSACTION_URL = "trade.inve.one";
-exports.TRANSACTION_URL = "172.17.2.118:35796";
-
-//exports.TRANSACTION_getURL = "localtoexp.inve.one:33790";
-exports.TRANSACTION_getURL = "172.17.2.118:35796";
 
 // true, when removed_paired_device commands received from peers are to be ignored. Default is false.
 exports.bIgnoreUnpairRequests = false;
@@ -62,6 +57,27 @@ if (process.browser){
 }
 exports.database = {};
 
+exports.configLiveNet ={
+    INVE_TRANSACTION_getURL: "localtoexp.inve.one:33790",
+    INVE_TRANSACTION_URL: "trade.inve.one",
+	INVE_SEED: "http://seed.trilliontrust.com:25003",
+	ETH_NODE: "http://eth.inve.one:8181",
+	ETH_API:"api.etherscan.io",
+	BTC_RPC: "btcrpc.inve.one",
+	BTC_API: "btcapi.inve.one"
+}
+
+exports.configTestNet ={
+    INVE_TRANSACTION_getURL: "172.17.2.118:35796",
+    INVE_TRANSACTION_URL: "172.17.2.118:35796",
+    INVE_SEED: "http://172.17.2.118:25003",
+    ETH_NODE: "http://13.125.253.106:8181",
+    ETH_API:"api-ropsten.etherscan.io",
+    BTC_RPC: "btcrpc.inve.one",
+    BTC_API: "btcapi.inve.one"
+}
+
+exports.URL = exports.configTestNet;
 
 /*
 There are 3 ways to customize conf in modules that use intervaluecore lib:

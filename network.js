@@ -1065,7 +1065,7 @@ function initWitnessesIfNecessary(ws, onDone) {
 function startLightClient() {
     wss = { clients: [] };
     setInterval( requestTransactionHistory, 5 * 1000);
-    setInterval(requestOtherTransactionHistory, 34 * 1000);
+    setInterval(requestOtherTransactionHistory, 13 * 1000);
     setInterval(requestTransactionHistoryMulti,  60 * 1000);
     //setInterval(requestUpdateETH, 60 * 1000 * 10);
 }

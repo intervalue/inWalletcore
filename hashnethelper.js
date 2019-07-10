@@ -182,7 +182,7 @@ class HashnetHelper {
 
             let type = [1, 2];
             //从共识网拉取交易记录
-            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
+            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
                 address,
                 tableIndex,
                 offset,
@@ -235,7 +235,7 @@ class HashnetHelper {
             // if (!localfullnode) {
             //     throw new Error('network error, please try again.');
             // }
-            let result = await webHelper.httpPost(getUrl(config.TRANSACTION_getURL, '/v1/gettransaction'), null, buildData({hash}));
+            let result = await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransaction'), null, buildData({hash}));
             return result ? JSON.parse(result) : null;
         }
         catch (e) {
@@ -252,7 +252,7 @@ class HashnetHelper {
      * @returns {Promise<*>}
      */
     static async getNRGPrice() {
-        let url = device.my_device_hashnetseed_url;
+        let url = config.URL.INVE_SEED;
         try {
             let result = JSON.parse(await webHelper.httpPost(url + '/v1/price/nrg', null, {}));
             if (result.code == 200) {
@@ -276,7 +276,7 @@ class HashnetHelper {
      */
     static async getAccountInfo (address) {
 
-        let localfullnode = config.TRANSACTION_getURL;
+        let localfullnode = config.URL.INVE_TRANSACTION_getURL;
 
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/account/info'), null, {address:address}));

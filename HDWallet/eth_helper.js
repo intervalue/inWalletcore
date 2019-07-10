@@ -9,6 +9,7 @@ var secp256k1 = require('secp256k1');
 // var SHA3 = require('keccakjs')
 const bitcoin = require('bitcoinjs-lib');
 const webHelper = require('../webhelper');
+var config = require('../conf.js');
 var db = require('../db.js');
 const BigNumber = require('bignumber.js');
 var mutex = require('../mutex.js');
@@ -18,7 +19,7 @@ if (typeof web3 !== 'undefined') {
     web3 = new Web3(web3.currentProvider);
 } else {
     // set the provider you want from Web3.providers
-    web3 = new Web3(new Web3.providers.HttpProvider("http://13.125.253.106:8181"));
+    web3 = new Web3(new Web3.providers.HttpProvider(config.URL.ETH_NODE));
     //web3 = new Web3(new Web3.providers.HttpProvider("http://eth.inve.one:8181"));
 }
 var Tx = require('ethereumjs-tx');
@@ -265,7 +266,7 @@ function getTransactions (address, cb){
             }
         }
         //let url = 'https://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
-        let url = 'https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
+        let url = 'https://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
         webHelper.httpGet(url,null, function(err, result){
             cb(err, result, address, page);
         });

@@ -22,7 +22,7 @@ var my_device_name;
 var my_device_address;
 //var my_device_hashnetseed_url = "http://35.170.77.230:25003";//外网测试IP
 //var my_device_hashnetseed_url = "http://seed.trilliontrust.com:25003"; //外网正式IP
-var my_device_hashnetseed_url = "http://172.17.2.118:25003";//局域网IP
+var my_device_hashnetseed_url = conf.URL.INVE_SEED;//局域网IP
 var objMyPermanentDeviceKey;
 var objMyTempDeviceKey;
 var objMyPrevTempDeviceKey;
