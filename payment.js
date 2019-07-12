@@ -28,7 +28,7 @@ async function getNrgPrice(){
     if(!NRG_PRICE) {
         NRG_PRICE = await hashnethelper.getNRGPrice();
     }
-            return NRG_PRICE;
+    return NRG_PRICE;
     //         if(NRG_PRICE) {
     //             clearInterval(tranNrgPrice)
     //             return NRG_PRICE;
@@ -95,9 +95,9 @@ async function transactionMessage(data,cb) {
 }
 
 /**构造文本交易结构
-* @param data
-* @returns {{fromAddress: *, toAddress: *, amount: string, timestamp: number, remark: string, vers: string, pubkey: *, type: number, fee: string, nrgPrice: number}}
-*/
+ * @param data
+ * @returns {{fromAddress: *, toAddress: *, amount: string, timestamp: number, remark: string, vers: string, pubkey: *, type: number, fee: string, nrgPrice: number}}
+ */
 async function transactionContext(data,cb) {
     var Bitcore = require('bitcore-lib');
     NRG_PRICE = await getNrgPrice();
@@ -171,14 +171,14 @@ async function contractTransactionData(opts,cb) {
         console.log("data.callData: ",data.callData)
         data = utils.stringToBase64(JSON.stringify(data));
         let obj = {
-                fromAddress: opts.fromAddress,
-                timestamp: Math.round(Date.now()),
-                data: data,
-                //data: new Buffer(JSON.stringify(data)).toString("base64"),
-                vers: transationVersion,
-                pubkey: opts.pubkey,
-                type: 2
-            }
+            fromAddress: opts.fromAddress,
+            timestamp: Math.round(Date.now()),
+            data: data,
+            //data: new Buffer(JSON.stringify(data)).toString("base64"),
+            vers: transationVersion,
+            pubkey: opts.pubkey,
+            type: 2
+        }
         var xPrivKey = new Bitcore.HDPrivateKey.fromString(opts.xprivKey);
         let buf_to_sign = objectHash.getUnitHashToSign(obj);
         let pathSign = "m/44'/0'/0'/0/0";
@@ -199,15 +199,15 @@ async function contractTransactionData(opts,cb) {
 let urlList = [];
 async function sendTransactions(opts, cb){
     try{
-        if(urlList.length == 0){
-            let result = await webHelper.httpPost(device.my_device_hashnetseed_url + '/v1/getlocalfullnodes', null, {pubkey: opts.pubkey});
-            let localfullnodes = JSON.parse(JSON.parse(result).data);
-            _.forEach(localfullnodes,function (res) {
-                urlList.push(`${res.ip}:${res.httpPort}`)
-            });
-        }
-        let localfullnode =urlList[Math.round(Math.random() * urlList.length)];
-        localfullnode = config.TRANSACTION_URL;
+        // if(urlList.length == 0){
+        //     let result = await webHelper.httpPost(device.my_device_hashnetseed_url + '/v1/getlocalfullnodes', null, {pubkey: opts.pubkey});
+        //     let localfullnodes = JSON.parse(JSON.parse(result).data);
+        //     _.forEach(localfullnodes,function (res) {
+        //         urlList.push(`${res.ip}:${res.httpPort}`)
+        //     });
+        // }
+        // let localfullnode =urlList[Math.round(Math.random() * urlList.length)];
+        let localfullnode = config.URL.INVE_TRANSACTION_URL;
         let message = JSON.stringify(opts);
         let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/sendmsg'), null, buildData({message})));
         if (resultMessage.code != 200) {
@@ -255,9 +255,9 @@ function sendTransactionToOtherServer(data, cb){
                 res = JSON.parse(res);
                 if(res.errorcode =="0"){
                     inserTrans(data.paybody.message);
-                     cb(null, res);
+                    cb(null, res);
                 }else {
-                     cb(res.errormsg);
+                    cb(res.errormsg);
                 }
 
             }
@@ -295,12 +295,12 @@ let inserTrans = async (obj) => {
             obj.isStable = 1;
             obj.isValid = 0;
             light.refreshTranList(obj);
-           return '';
+            return '';
 
         }
         catch (e) {
             console.log(e.toString());
-          return toString()
+            return toString()
         }
         finally {
             //解锁队列

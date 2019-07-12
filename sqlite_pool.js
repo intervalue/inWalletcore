@@ -2,7 +2,7 @@
 "use strict";
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-
+var updateTable = require('./updateTable.js')
 var bCordova = (typeof window === 'object' && window.cordova);
 var sqlite3;
 var path;
@@ -204,9 +204,9 @@ module.exports = function (db_name, MAX_CONNECTIONS, bReadOnly) {
                     connection.query("PRAGMA journal_mode=WAL", function () {
                         connection.query("PRAGMA synchronous=FULL", function () {
                             connection.query("PRAGMA temp_store=MEMORY", function () {
-                                // sqlite_migrations.migrateDb(connection, function () {
-                                handleConnection(connection);
-                                // });
+                                updateTable.migrateDb(connection, function () {
+                                    handleConnection(connection);
+                                });
                             });
                         });
                     });

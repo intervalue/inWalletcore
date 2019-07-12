@@ -206,11 +206,13 @@ async function updateHistory(addresses) {
     let data;
     let tableIndex = 0;
     let offset = 0;
+    let sysTableIndex = 0;
+    let sysOffset = 0;
     try {
         for (var address of addresses) {
             await iniTranList(address);
             //从共识网拉取交易记录
-            data = await hashnethelper.getTransactionHistory(address, tableIndex, offset);
+            data = await hashnethelper.getTransactionHistory(address, tableIndex, offset, sysTableIndex, sysOffset);
             let result = data.result;
             // if(data.offset != tranList.length+result.length ){
             //     await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, 0, data.address);
@@ -261,7 +263,7 @@ async function updateHistory(addresses) {
                     await insertTran(tran, data);
                     eventBus.emit('newtransaction', tran);
                 } else {
-                    await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, data.offset, data.address);
+                    await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
                     eventBus.emit('newtransaction', tran);
                 }
             }
@@ -1453,7 +1455,7 @@ async function insertTran(tran, data) {
         // var params = [tran.hash, tran.time, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(tran), tran.remark, amountPoint, feePoint];
         var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint];
         db.addCmd(cmds, "INSERT INTO transactions (" + fields + ") VALUES (" + values + ")", ...params);
-        db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, data.offset, data.address);
+        db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset,data.sysTableIndex, data.sysOffset, data.address);
         // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
         //用队列的方式更新数据库
         await mutex.lock(["write"], async function (unlock) {

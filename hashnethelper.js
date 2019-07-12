@@ -157,7 +157,7 @@ class HashnetHelper {
 
     //获取交易记录
 
-    static async getTransactionHistory(address, tableIndex, offset) {
+    static async getTransactionHistory(address, tableIndex, offset, sysTableIndex,sysOffset ) {
         //获取局部全节点
        // let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
 
@@ -169,10 +169,12 @@ class HashnetHelper {
             // console.log(rows[0].tableIndex);
             // console.log(rows[0].offsets);
             tableIndex = rows[0].tableIndex;
+            sysTableIndex = rows[0].sysTableIndex;
             offset = initGet ? rows[0].offsets - 10 : rows[0].offsets;
+            sysOffset = initGet ? rows[0].sysOffset - 10 : rows[0].sysOffset;
             initGet = false;
         } else {
-            await db.execute("INSERT INTO transactions_index (address ,tableIndex,offsets) VALUES(?,0,0)", address);
+            await db.execute("INSERT INTO transactions_index (address ,tableIndex,offsets, sysTableIndex, sysOffset) VALUES(?,0,0,0,0)", address);
         }
 
         try {
@@ -182,10 +184,12 @@ class HashnetHelper {
 
             let type = [1, 2];
             //从共识网拉取交易记录
-            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
+            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlistnew'), null, buildData({
                 address,
                 tableIndex,
+                sysTableIndex,
                 offset,
+                sysOffset,
                 type
             })));
 
@@ -196,21 +200,25 @@ class HashnetHelper {
                 result = JSON.parse(result);
 
                 tableIndex = result.tableIndex ? result.tableIndex : 0;
+                sysTableIndex = result.sysTableIndex ? result.sysTableIndex : 0;
                 offset = result.offset ? result.offset : 0;
+                sysOffset = result.sysOffset ? result.sysOffset : 0;
 
                 // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",tableIndex,offset,address);
 
-                return result.list ? {result: result.list, tableIndex, offset, address} : {
+                return result.list ? {result: result.list, tableIndex, offset, address, sysTableIndex, sysOffset} : {
                     result: [],
                     tableIndex,
                     offset,
-                    address
+                    address,
+                    sysTableIndex,
+                    sysOffset
                 };
                 // }else
                 //     return {result:[],tableIndex,offset,address};
 
             } else {
-                return {result: [], tableIndex, offset, address}
+                return {result: [], tableIndex, offset, address, sysTableIndex, sysOffset}
             }
             // return result ? JSON.parse(result) : [];
         } catch (e) {
@@ -218,7 +226,7 @@ class HashnetHelper {
             // if (localfullnode) {
             //     await HashnetHelper.reloadLocalfullnode(localfullnode);
             // }
-            return {result: [], tableIndex, offset, address};
+            return {result: [], tableIndex, offset, address, sysTableIndex, sysOffset};
         }
     }
 
