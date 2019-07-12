@@ -14,6 +14,9 @@ function migrateDb(connection, onDone){
 
         var version = rows[0].user_version;
         console.log("db version "+version+", software version "+VERSION);
+        if(VERSION == version){
+            return onDone();
+        }
         var arrQueries = [];
         if(VERSION == 1 && version == 18){
             connection.addQuery(arrQueries, "ALTER TABLE transactions_index ADD COLUMN sysTableIndex INTEGER  DEFAULT 0");
