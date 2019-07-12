@@ -300,6 +300,30 @@ class HashnetHelper {
         }
 
     }
+
+    /**
+     * 获取合约执行结果
+     * @param address
+     * @returns {Promise<*>}
+     */
+    static async getReceipt (hash) {
+
+        let localfullnode = config.URL.INVE_TRANSACTION_getURL;
+
+        try {
+            let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/getReceipt'), null, {hash:hash}));
+            if (result.code == 200) {
+                let data = JSON.parse(result.data);
+                return data;
+            } else {
+                return null;
+            }
+        } catch (e) {
+            console.log('getReceipt error: ', e.toString());
+            return e.toString();
+        }
+
+    }
 }
 //组装访问共识网的url
 let getUrl = (localfullnode, suburl) => {

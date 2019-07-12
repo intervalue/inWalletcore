@@ -57,122 +57,122 @@ async function updateMultiTrans(addressObj, allAddress) {
     let length = addressObj.length;
     for (let i = 0; i < length; i++) {
         setTimeout(function () {
-        let key = addressObj[i].walletId;
-        let addressOne = addressObj[i].address;
-        var webHelper = require('./sendTransactionToNode');
-        let multiLength = multiUrl.length;
-        for (let j = 0; j < multiLength; j++) {
-            let url = multiUrl[j];
-            let chooseNetWork = 'http://' + url + '/addressSelect';
-            let jsonObject = { "address": addressOne };
-            jsonObject = JSON.parse(JSON.stringify(jsonObject));
-            function updateMultiOrder(one, result, type, sInfo, eInfo) {
-                if (one != undefined && one.multiHash == result.orderNumber) {
-                    if (one.eStatu != result.status || one.sInfo.length == 0 || one.eInfo.length == 0) {
-                        db.query('update transactions set eStatu = ?,sInfo = ?, eInfo = ? where id = ?', [result.status, sInfo, eInfo, one.id], function (result) {
-                            //console.log(result);
-                        });
-                    }
-                } else {
-                    if (one != undefined) {
-                        db.query('update transactions set multiHash = ?,type = ?,eStatu = ?, sType = ?, eType = ?, sInfo = ?, eInfo = ? where id = ?', [result.orderNumber, type, result.status, getIndex(result.sourceCurrency), getIndex(result.desCurrency), sInfo, eInfo, one.id], function (result) {
-                            //console.log(result);
-                        });
+            let key = addressObj[i].walletId;
+            let addressOne = addressObj[i].address;
+            var webHelper = require('./sendTransactionToNode');
+            let multiLength = multiUrl.length;
+            for (let j = 0; j < multiLength; j++) {
+                let url = multiUrl[j];
+                let chooseNetWork = 'http://' + url + '/addressSelect';
+                let jsonObject = { "address": addressOne };
+                jsonObject = JSON.parse(JSON.stringify(jsonObject));
+                function updateMultiOrder(one, result, type, sInfo, eInfo) {
+                    if (one != undefined && one.multiHash == result.orderNumber) {
+                        if (one.eStatu != result.status || one.sInfo.length == 0 || one.eInfo.length == 0) {
+                            db.query('update transactions set eStatu = ?,sInfo = ?, eInfo = ? where id = ?', [result.status, sInfo, eInfo, one.id], function (result) {
+                                //console.log(result);
+                            });
+                        }
+                    } else {
+                        if (one != undefined) {
+                            db.query('update transactions set multiHash = ?,type = ?,eStatu = ?, sType = ?, eType = ?, sInfo = ?, eInfo = ? where id = ?', [result.orderNumber, type, result.status, getIndex(result.sourceCurrency), getIndex(result.desCurrency), sInfo, eInfo, one.id], function (result) {
+                                //console.log(result);
+                            });
+                        }
                     }
                 }
-            }
 
-            function insertMultiOrder(hash, result, type, sInfo, eInfo) {
-                db.query('update transactions set multiHash = ?,type = ?,eStatu = ?, sType = ?, eType = ?, sInfo = ?, eInfo = ? where id = ?', [result.orderNumber, type, result.status, getIndex(result.sourceCurrency), getIndex(result.desCurrency), sInfo, eInfo, hash], function (result) {
-                    //console.log(result);
-                    fresh = true;
-                });
-            }
-
-            function getIndex(str) {
-                if (str == 'INVE') {
-                    return 1;
-                } else if (str == 'BTC') {
-                    return 2;
-                } else if (str == 'ETH') {
-                    return 3;
-                } else {
-                    return 0;
+                function insertMultiOrder(hash, result, type, sInfo, eInfo) {
+                    db.query('update transactions set multiHash = ?,type = ?,eStatu = ?, sType = ?, eType = ?, sInfo = ?, eInfo = ? where id = ?', [result.orderNumber, type, result.status, getIndex(result.sourceCurrency), getIndex(result.desCurrency), sInfo, eInfo, hash], function (result) {
+                        //console.log(result);
+                        fresh = true;
+                    });
                 }
-            }
-            webHelper.post(chooseNetWork, jsonObject, { "Content-Type": "application/json" }, function (err2, resultList) {
-                if (err2) {
-                    console.log(err2);
-                } else {
-                    resultList = JSON.parse(JSON.stringify(resultList.body));
-                    let result2Length = resultList.length;
-                    for (let j = 0; j < result2Length; j++) {
-                        let result2 = resultList[j];
-                        let address = _.indexOf(allAddress, addressOne);
-                        if (address > -1) {
-                            if (result2.type == 'transfer') {
-                                let stoOne = _.find(multiHash, { 'id': result2.stoTransactionHash, 'addressFrom': address });
-                                let rtoOne = _.findLast(multiHash, { 'id': result2.rtoTransactionHash, 'addressTo': address });
-                                if (stoOne != undefined) {
-                                    updateMultiOrder(stoOne, result2, 1, result2.sourceAddress, result2.desAddress);
-                                }
-                                if (rtoOne != undefined) {
-                                    updateMultiOrder(rtoOne, result2, 1, result2.sourceAddress, result2.desAddress);
-                                }
-                                if (stoOne == undefined && addressOne == result2.sourceAddress) {
-                                    insertMultiOrder(result2.stoTransactionHash, result2, 1, result2.sourceAddress, result2.desAddress);
-                                }
-                                if (rtoOne == undefined && addressOne == result2.desAddress) {
-                                    insertMultiOrder(result2.rtoTransactionHash, result2, 1, result2.sourceAddress, result2.desAddress);
-                                }
-                            } else {
-                                /**
-                                 * B用户已经可以去查了
-                                 */
-                                let stoOne = _.find(multiHash, { id: result2.stoTransactionHash, 'addressFrom': address });
-                                let rtoOne = _.find(multiHash, { id: result2.rtoTransactionHash, 'addressTo': address });
-                                let dtoFirst = _.find(multiHash, { id: result2.dtoTransactionHash, 'addressFrom': address });
-                                let dtoLast = _.find(multiHash, { id: result2.dtoTransactionHash, 'addressTo': address });
-                                if (result2.oppositeSourceAddress == addressOne && result2.status < 3 && result2.status != 0) {
-                                    let check = { 'walletId': key, 'result': result2 };
-                                    //needCheck.push(check);
-                                    check.url = url;
-                                    eventBus.emit('newMultiTrans', check);
-                                }
 
-                                if (result2.stoTransactionHash != '' && addressOne == result2.sourceAddress && stoOne != undefined) {
-                                    updateMultiOrder(stoOne, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                }
-                                if (result2.rtoTransactionHash != '' && addressOne == result2.oppositeDesAddress && rtoOne != undefined) {
-                                    updateMultiOrder(rtoOne, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                }
-                                if (dtoFirst != undefined && result2.dtoTransactionHash != '' && (addressOne == result2.desAddress || addressOne == result2.oppositeSourceAddress)) {
-                                    if (addressOne == result2.desAddress) {
-                                        updateMultiOrder(dtoFirst, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                    } else {
-                                        updateMultiOrder(dtoFirst, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                function getIndex(str) {
+                    if (str == 'INVE') {
+                        return 1;
+                    } else if (str == 'BTC') {
+                        return 2;
+                    } else if (str == 'ETH') {
+                        return 3;
+                    } else {
+                        return 0;
+                    }
+                }
+                webHelper.post(chooseNetWork, jsonObject, { "Content-Type": "application/json" }, function (err2, resultList) {
+                    if (err2) {
+                        console.log(err2);
+                    } else {
+                        resultList = JSON.parse(JSON.stringify(resultList.body));
+                        let result2Length = resultList.length;
+                        for (let j = 0; j < result2Length; j++) {
+                            let result2 = resultList[j];
+                            let address = _.indexOf(allAddress, addressOne);
+                            if (address > -1) {
+                                if (result2.type == 'transfer') {
+                                    let stoOne = _.find(multiHash, { 'id': result2.stoTransactionHash, 'addressFrom': address });
+                                    let rtoOne = _.findLast(multiHash, { 'id': result2.rtoTransactionHash, 'addressTo': address });
+                                    if (stoOne != undefined) {
+                                        updateMultiOrder(stoOne, result2, 1, result2.sourceAddress, result2.desAddress);
                                     }
-                                }
+                                    if (rtoOne != undefined) {
+                                        updateMultiOrder(rtoOne, result2, 1, result2.sourceAddress, result2.desAddress);
+                                    }
+                                    if (stoOne == undefined && addressOne == result2.sourceAddress) {
+                                        insertMultiOrder(result2.stoTransactionHash, result2, 1, result2.sourceAddress, result2.desAddress);
+                                    }
+                                    if (rtoOne == undefined && addressOne == result2.desAddress) {
+                                        insertMultiOrder(result2.rtoTransactionHash, result2, 1, result2.sourceAddress, result2.desAddress);
+                                    }
+                                } else {
+                                    /**
+                                     * B用户已经可以去查了
+                                     */
+                                    let stoOne = _.find(multiHash, { id: result2.stoTransactionHash, 'addressFrom': address });
+                                    let rtoOne = _.find(multiHash, { id: result2.rtoTransactionHash, 'addressTo': address });
+                                    let dtoFirst = _.find(multiHash, { id: result2.dtoTransactionHash, 'addressFrom': address });
+                                    let dtoLast = _.find(multiHash, { id: result2.dtoTransactionHash, 'addressTo': address });
+                                    if (result2.oppositeSourceAddress == addressOne && result2.status < 3 && result2.status != 0) {
+                                        let check = { 'walletId': key, 'result': result2 };
+                                        //needCheck.push(check);
+                                        check.url = url;
+                                        eventBus.emit('newMultiTrans', check);
+                                    }
 
-                                if (stoOne == undefined && addressOne == result2.sourceAddress) {
-                                    insertMultiOrder(result2.stoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                }
-                                if (rtoOne == undefined && addressOne == result2.oppositeDesAddress) {
-                                    insertMultiOrder(result2.rtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                }
-                                if (dtoFirst == undefined && addressOne == result2.oppositeSourceAddress || dtoLast == undefined && addressOne == result2.desAddress) {
-                                    if (addressOne == result2.desAddress) {
-                                        insertMultiOrder(result2.dtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
-                                    } else {
-                                        insertMultiOrder(result2.dtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                    if (result2.stoTransactionHash != '' && addressOne == result2.sourceAddress && stoOne != undefined) {
+                                        updateMultiOrder(stoOne, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                    }
+                                    if (result2.rtoTransactionHash != '' && addressOne == result2.oppositeDesAddress && rtoOne != undefined) {
+                                        updateMultiOrder(rtoOne, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                    }
+                                    if (dtoFirst != undefined && result2.dtoTransactionHash != '' && (addressOne == result2.desAddress || addressOne == result2.oppositeSourceAddress)) {
+                                        if (addressOne == result2.desAddress) {
+                                            updateMultiOrder(dtoFirst, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                        } else {
+                                            updateMultiOrder(dtoFirst, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                        }
+                                    }
+
+                                    if (stoOne == undefined && addressOne == result2.sourceAddress) {
+                                        insertMultiOrder(result2.stoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                    }
+                                    if (rtoOne == undefined && addressOne == result2.oppositeDesAddress) {
+                                        insertMultiOrder(result2.rtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                    }
+                                    if (dtoFirst == undefined && addressOne == result2.oppositeSourceAddress || dtoLast == undefined && addressOne == result2.desAddress) {
+                                        if (addressOne == result2.desAddress) {
+                                            insertMultiOrder(result2.dtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                        } else {
+                                            insertMultiOrder(result2.dtoTransactionHash, result2, 2, result2.sourceAddress + '|' + result2.desAddress, result2.oppositeSourceAddress + '|' + result2.oppositeDesAddress);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
 
         },i * 1000);
     }
@@ -1490,17 +1490,25 @@ exports.tranList = function () {
     return tranList;
 };
 
-function getDiceWin(address,cb){
-    db.query("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id like'%-1'",[address], function(res){
-        if(res.length > 0) {
-            res.forEach(function (i) {
-                 i.amount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-            })
-            cb(res)
-        }else {
-            cb([]);
-        }
-    });
+async function getDiceWin(address,cb){
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressTo=?",address);
+    if(res.length > 0){
+        res.forEach(async function (i) {
+            i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id=?",address,i.id+'-1');
+            if(res1.length == 1){
+                i.winnAmount= new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+            }
+            delete i.addressTo;
+            delete i.fee;
+            delete i.amount;
+            delete i.fee_point;
+            delete i.amount_point;
+        });
+        cb(res)
+    }else {
+        cb([])
+    }
 }
 
 exports.updateHistory = updateHistory;
