@@ -29,7 +29,6 @@ var otherPending = 0;
 var otherTranList = [];
 var otherTranObject = {};
 var other_finished = true;
-const BigNumber = require('bignumber.js');
 var haveUpdate = true;
 var veryTrue = [];
 
@@ -1491,6 +1490,19 @@ exports.tranList = function () {
     return tranList;
 };
 
+function getDiceWin(address,cb){
+    db.query("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id like'%-1'",[address], function(res){
+        if(res.length > 0) {
+            res.forEach(function (i) {
+                 i.amount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+            })
+            cb(res)
+        }else {
+            cb([]);
+        }
+    });
+}
+
 exports.updateHistory = updateHistory;
 exports.updateOtherHistory = updateOtherHistory;
 exports.refreshTranList = refreshTranList;
@@ -1510,4 +1522,5 @@ exports.updateMultiTrans = updateMultiTrans;
 exports.getCheck = getCheck;
 exports.setMultiUrl = setMultiUrl;
 exports.updateStatu = updateStatu;
+exports.getDiceWin = getDiceWin;
 //exports.getPending = getPending;
