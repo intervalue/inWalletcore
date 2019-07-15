@@ -159,9 +159,9 @@ class HashnetHelper {
 
     static async getTransactionHistory(address, tableIndex, offset, sysTableIndex,sysOffset ) {
         //获取局部全节点
-       // let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
+        // let localfullnode = await HashnetHelper.buildSingleLocalfullnode(address);
 
-        let rows = await db.execute("SELECT ti.tableIndex ,ti.offsets FROM transactions_index ti WHERE ti.address = ?", address);
+        let rows = await db.execute("SELECT ti.tableIndex ,ti.offsets, ti.sysTableIndex, ti.sysOffset FROM transactions_index ti WHERE ti.address = ?", address);
 
 
         if (rows != null && rows.length == 1) {
@@ -307,13 +307,16 @@ class HashnetHelper {
      * @returns {Promise<*>}
      */
     static async getReceipt (hash) {
-
+        if(hash.length != 90) {
+            hash = hash.substring(0,90)
+        }
         let localfullnode = config.URL.INVE_TRANSACTION_getURL;
 
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/getReceipt'), null, {hash:hash}));
             if (result.code == 200) {
                 let data = JSON.parse(result.data);
+
                 return data;
             } else {
                 return null;
