@@ -142,7 +142,7 @@ class HashnetHelper {
             console.log("sending unit:");
             let message = JSON.stringify(unit);
             //往共识网发送交易
-            let result = await webHelper.httpPost(getUrl(config.TRANSACTION_URL, '/v1/sendmsg'), null, buildData({message}));
+            let result = await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_URL, '/v1/sendmsg'), null, buildData({message}));
             // if(JSON.parse(result).code != 200 && JSON.parse(result).data.match(/sender is illegal/g)) {
             //     await sendMessageTry(unit)
             //     return
