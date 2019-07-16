@@ -1,6 +1,12 @@
 /*jslint node: true */
 "use strict";
-
+/**
+ * @description:
+ * 第一次更新sqlite数据库
+ * 初始化版本号version=1
+ * @author: lhp
+ * @time: 2019-07-16 11:04
+ */
 var VERSION = 1;
 
 var async = require('async');
