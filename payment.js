@@ -235,7 +235,7 @@ function sendTransactionToOtherServer(data, cb){
         let obj =
             {
                 //localfullnode_list: data.localfullnode_list,    //发送到intervalue的local full node
-                localfullnode_list: [config.TRANSACTION_URL],    //发送到intervalue的local full node
+                localfullnode_list: [config.URL.INVE_TRANSACTION_URL],    //发送到intervalue的local full node
                 bizid: data.bizid,           //商家号
                 paysign: data.paysign,          //支付系统对本次支付交易的签名
                 orderid: data.orderid,          //商家生成的订单号
