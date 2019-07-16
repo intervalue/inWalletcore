@@ -228,7 +228,7 @@ async function sendTransactions(opts, cb){
  * @param data
  * @param cb
  */
-function sendTransactionToOtherServer(data, cb){
+async function sendTransactionToOtherServer(data, cb){
     try{
         let url = constants.payUrl;
         let obj =
@@ -246,24 +246,17 @@ function sendTransactionToOtherServer(data, cb){
                     message: data.paybody.message
                 }   //intervalue要求的转帐数据体
             }
-        webHelper.httpPost(url, header, obj, function (err, res) {
-            if(err){
-                return cb(err);
-            }
-            else{
-                res = JSON.parse(res);
-                if(res.errorcode =="0"){
-                    inserTrans(data.paybody.message);
-                    cb(null, res);
-                }else {
-                    cb(res.errormsg);
-                }
-
-            }
-        });
+        let res = await webHelper.httpPost(url, header, obj);
+        res = JSON.parse(res);
+        if(res.errorcode =="0"){
+           await inserTrans(data.paybody.message);
+            cb(null, res);
+        }else {
+            cb(res.errormsg);
+        }
 
     }catch (e) {
-        cb(e.toString(), null)
+        cb(e.toString())
     }
 
 }

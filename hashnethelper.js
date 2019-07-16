@@ -184,7 +184,7 @@ class HashnetHelper {
 
             let type = [1, 2];
             //从共识网拉取交易记录
-            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlistnew'), null, buildData({
+            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
                 address,
                 tableIndex,
                 sysTableIndex,
