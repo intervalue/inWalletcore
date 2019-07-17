@@ -1480,9 +1480,15 @@ async function insertTran(tran, data) {
         let feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
         if(tran.type == 2){
             let res = await hashnethelper.getReceipt(tran.signature);
-            fee = (res.gasUsed * NRG_PRICE).toString();
-            feeInt = parseInt(fee.replace(/"/g,'').substring(-1,fee.length-18) ? fee.replace(/"/g,'').substring(-1,fee.length-18) : 0);
-            feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
+            if(res){
+                fee = (res.gasUsed * NRG_PRICE).toString();
+                feeInt = parseInt(fee.replace(/"/g,'').substring(-1,fee.length-18) ? fee.replace(/"/g,'').substring(-1,fee.length-18) : 0);
+                feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
+            }else {
+                feeInt = "0"
+                feePoint = "0"
+            }
+
 
         }
         let Base64 = require('./base64Code');

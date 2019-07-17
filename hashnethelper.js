@@ -184,7 +184,7 @@ class HashnetHelper {
 
             let type = [1, 2];
             //从共识网拉取交易记录
-            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlist'), null, buildData({
+            let resultMessage = JSON.parse(await webHelper.httpPost(getUrl(config.URL.INVE_TRANSACTION_getURL, '/v1/gettransactionlistnew'), null, buildData({
                 address,
                 tableIndex,
                 sysTableIndex,
@@ -307,11 +307,7 @@ class HashnetHelper {
      * @returns {Promise<*>}
      */
     static async getReceipt (hash) {
-        if(hash.length != 90) {
-            hash = hash.substring(0,90)
-        }
         let localfullnode = config.URL.INVE_TRANSACTION_getURL;
-
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/getReceipt'), null, {hash:hash}));
             if (result.code == 200) {

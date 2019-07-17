@@ -171,7 +171,7 @@ async function contractTransactionData(opts,cb) {
         let data ={
             nonce: nonce.toString(),
             //callData: utils.stringToBase64("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData),
-            callData: utils.stringToBase64(utils.Hexstring2btye("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData)),
+            callData: "3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData,
             gasPrice: gasPrice.toString(),
             value: value.toString(),
             gasLimit: gasLimit.toString(),
