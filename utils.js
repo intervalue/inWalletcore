@@ -89,8 +89,9 @@ let numberToBase64 = (data) => {
     let n = new Decimal(data);
     let k = n.toNumber().toString(16);
     k = k.length % 2 == 1 ? "0" + k : k;
-    return Buffer.from(k, 'hex').toString("base64")
+   return Buffer.from(k, 'hex').toString("base64")
 }
+
 
 /**
  * base转字符串

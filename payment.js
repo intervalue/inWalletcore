@@ -159,14 +159,23 @@ async function contractTransactionData(opts,cb) {
         let gasLimit = constants.BASE_NRG;
         //let gasLimit = 2000000;
         let toAddress = opts.toAddress;
+        // let data ={
+        //     nonce: utils.numberToBase64(nonce),
+        //     //callData: utils.stringToBase64("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData),
+        //     callData: utils.stringToBase64(utils.Hexstring2btye("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData)),
+        //     gasPrice: utils.numberToBase64(gasPrice),
+        //     value: utils.numberToBase64(value),
+        //     gasLimit: utils.numberToBase64(gasLimit),
+        //     toAddress: utils.stringToBase64(toAddress)
+        // }
         let data ={
-            nonce: utils.numberToBase64(nonce),
+            nonce: nonce.toString(),
             //callData: utils.stringToBase64("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData),
             callData: utils.stringToBase64(utils.Hexstring2btye("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData)),
-            gasPrice: utils.numberToBase64(gasPrice),
-            value: utils.numberToBase64(value),
-            gasLimit: utils.numberToBase64(gasLimit),
-            toAddress: utils.stringToBase64(toAddress)
+            gasPrice: gasPrice.toString(),
+            value: value.toString(),
+            gasLimit: gasLimit.toString(),
+            toAddress: toAddress.toString()
         }
         data = utils.stringToBase64(JSON.stringify(data));
         let obj = {
@@ -264,10 +273,14 @@ async function sendTransactionToOtherServer(data, cb){
 let inserTrans = async (obj) => {
     if(obj.hasOwnProperty("data")){
         let b = JSON.parse(new Buffer(obj.data,"base64").toString());
-        obj.amount = utils.base64ToNumber(b.value).toString();
-        obj.fee = utils.base64ToNumber(b.gasLimit);
-        obj.toAddress = utils.base64ToString(b.toAddress);
-        obj.nrgPrice = utils.base64ToNumber(b.gasPrice)
+        // obj.amount = utils.base64ToNumber(b.value).toString();
+        // obj.fee = utils.base64ToNumber(b.gasLimit);
+        // obj.toAddress = utils.base64ToString(b.toAddress);
+        // obj.nrgPrice = utils.base64ToNumber(b.gasPrice)
+        obj.amount = b.value;
+        obj.fee = b.gasLimit;
+        obj.toAddress = b.toAddress;
+        obj.nrgPrice = b.gasPrice;
     }
     let amount = obj.amount;
     let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);

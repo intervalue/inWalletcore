@@ -1311,10 +1311,14 @@ async function updateTran(tran, data) {
     let obj = JSON.parse(tran.message);
     if (obj.hasOwnProperty("data")) {
         let b = JSON.parse(new Buffer(obj.data, "base64").toString());
-        obj.amount = utils.base64ToNumber(b.value).toString();
-        obj.fee = utils.base64ToNumber(b.gasLimit);
-        obj.toAddress = utils.base64ToString(b.toAddress);
-        obj.nrgPrice = utils.base64ToNumber(b.gasPrice)
+        // obj.amount = utils.base64ToNumber(b.value).toString();
+        // obj.fee = utils.base64ToNumber(b.gasLimit);
+        // obj.toAddress = utils.base64ToString(b.toAddress);
+        // obj.nrgPrice = utils.base64ToNumber(b.gasPrice)
+        obj.amount = b.value;
+        obj.fee = b.gasLimit;
+        obj.toAddress = b.toAddress;
+        obj.nrgPrice = b.gasPrice;
     }
     if (obj.type == 2) {
         let res = await hashnethelper.getReceipt(id);
@@ -1458,10 +1462,14 @@ async function insertTran(tran, data) {
         tran = JSON.parse(tran.message);
         if(tran.hasOwnProperty("data")){
             let b = JSON.parse(new Buffer(tran.data,"base64").toString());
-            tran.amount = utils.base64ToNumber(b.value).toString();
-            tran.fee = utils.base64ToNumber(b.gasLimit);
-            tran.toAddress = utils.base64ToString(b.toAddress);
-            tran.nrgPrice = utils.base64ToNumber(b.gasPrice)
+            // tran.amount = utils.base64ToNumber(b.value).toString();
+            // tran.fee = utils.base64ToNumber(b.gasLimit);
+            // tran.toAddress = utils.base64ToString(b.toAddress);
+            // tran.nrgPrice = utils.base64ToNumber(b.gasPrice)
+            tran.amount = b.value;
+            tran.fee = b.gasLimit;
+            tran.toAddress = b.toAddress;
+            tran.nrgPrice = b.gasPrice;
         }
         let amount = tran.amount;
         let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
