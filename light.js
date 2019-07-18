@@ -1470,6 +1470,10 @@ async function insertTran(tran, data) {
             tran.fee = b.gasLimit;
             tran.toAddress = b.toAddress;
             tran.nrgPrice = b.gasPrice;
+            if(tran.toAddress == ""){
+                let res = await hashnethelper.getReceipt(tran.signature);
+                tran.toAddress = new Buffer.from(res.executionResult,'hex').toString();
+            }
         }
         let amount = tran.amount;
         let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);

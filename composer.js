@@ -129,9 +129,10 @@ async function writeTran(params, handleResult) {
             var Decimal = require('decimal.js');
 
             //let stablesFrom = stable[0].amount + stable[0].amount_point / parseInt(1 + zero) - stable[0].fee - stable[0].fee_point / parseInt(1 + zero);
-            let stablesTo = new Decimal(stablesFrom).sub(params.amount).sub(new Decimal(obj.fee*obj.nrgPrice / 1000000000000000000)).toString();
-            let compareStables = new Decimal(stablesTo) >0
-            if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
+            let stablesTo = new Decimal(params.amount).add(new Decimal(obj.fee*obj.nrgPrice / 1000000000000000000)).toFixed();
+
+            if (new Decimal(stablesFrom).comparedTo(stablesTo) < 0) {
+            //if (!compareStables ||(compareStables && stablesTo.substr(0,1) == "-")) {
                 return handleResult("not enough spendable funds from " + params.to_address + " for " + (parseInt(obj.fee) + parseInt(obj.amount)));
             }
             //获取签名的BUF
