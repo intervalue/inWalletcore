@@ -1541,13 +1541,14 @@ exports.tranList = function () {
 };
 
 async function getDiceWin(address,cb){
-    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressTo=?",address);
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressTo=? and result<>'final-bad'",address);
     if(res.length > 0){
         res.forEach(async function (i) {
             i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id=?",address,i.id+'-1');
+            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id=?",address,i.id+'_1');
             if(res1.length == 1){
-                i.winnAmount= new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+                i.winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+                i.winnAmount = i.winnAmount == i.lotteryAmount ?"":i.winnAmount;
             }
             delete i.addressTo;
             delete i.fee;
