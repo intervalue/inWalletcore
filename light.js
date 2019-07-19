@@ -1309,6 +1309,7 @@ async function updateTran(tran, data) {
     let sql;
     let parm;
     let obj = JSON.parse(tran.message);
+    let fee = "0";
     if (obj.hasOwnProperty("data")) {
         let b = JSON.parse(new Buffer(obj.data, "base64").toString());
         // obj.amount = utils.base64ToNumber(b.value).toString();
@@ -1316,7 +1317,7 @@ async function updateTran(tran, data) {
         // obj.toAddress = utils.base64ToString(b.toAddress);
         // obj.nrgPrice = utils.base64ToNumber(b.gasPrice)
         obj.amount = b.value;
-        obj.fee = b.gasLimit;
+        fee = b.gasLimit;
         obj.toAddress = b.toAddress;
         obj.nrgPrice = b.gasPrice;
         if(obj.toAddress == ""){
@@ -1328,12 +1329,15 @@ async function updateTran(tran, data) {
         let res = await hashnethelper.getReceipt(id);
         let NRG_PRICE = obj.nrgPrice;
         if(res) {
-            obj.fee = (res.gasUsed * NRG_PRICE).toString();
+            fee = (res.gasUsed * NRG_PRICE).toString();
             obj.feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
             obj.feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
             obj.executionResult = res.executionResult ? res.executionResult :"";
             obj.error = res.error ? res.error : "";
 
+        }else {
+            obj.feeInt = "0"
+            obj.feePoint = "0"
         }
 
         db.addCmd(cmds, "update transactions set result = 'good', fee =?, fee_point=?, executionResult=?, error=?   where id = ?", obj.feeInt, obj.feePoint,obj.executionResult, obj.error, id);
