@@ -7,7 +7,7 @@
  * @author: lhp
  * @time: 2019-07-16 11:04
  */
-var VERSION = 1;
+var VERSION = 2;
 
 var async = require('async');
 var bCordova = (typeof window === 'object' && window.cordova);
@@ -28,6 +28,9 @@ function migrateDb(connection, onDone){
             connection.addQuery(arrQueries, "ALTER TABLE transactions_index ADD COLUMN sysTableIndex INTEGER  DEFAULT 0");
             connection.addQuery(arrQueries, "ALTER TABLE transactions_index ADD COLUMN sysOffset INTEGER  DEFAULT 0");
             connection.addQuery(arrQueries, "ALTER TABLE transactions ADD COLUMN tranType INTEGER  DEFAULT 1");
+        }
+        if(VERSION == 2 && version != 18){
+            connection.addQuery(arrQueries, "ALTER TABLE transactions ADD COLUMN executionResult CHAR ");
         }
         connection.addQuery(arrQueries, "PRAGMA user_version="+VERSION);
         async.series(arrQueries, function(){

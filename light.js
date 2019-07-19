@@ -1319,15 +1319,23 @@ async function updateTran(tran, data) {
         obj.fee = b.gasLimit;
         obj.toAddress = b.toAddress;
         obj.nrgPrice = b.gasPrice;
+        if(obj.toAddress == ""){
+            let res = await hashnethelper.getReceipt(id);
+            tran.toAddress = new Buffer.from(res.executionResult,'hex').toString();
+        }
     }
     if (obj.type == 2) {
         let res = await hashnethelper.getReceipt(id);
         let NRG_PRICE = obj.nrgPrice;
-        let fee = (res.gasUsed * NRG_PRICE).toString();
-        let feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
-        let feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
+        if(res) {
+            obj.fee = (res.gasUsed * NRG_PRICE).toString();
+            obj.feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
+            obj.feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
+            obj.executionResult = res.executionResult ? res.executionResult :"";
 
-        db.addCmd(cmds, "update transactions set result = 'good', fee =?, fee_point=?   where id = ?", feeInt, feePoint, id)
+        }
+
+        db.addCmd(cmds, "update transactions set result = 'good', fee =?, fee_point=?, executionResult=?   where id = ?", obj.feeInt, obj.feePoint,obj.executionResult, id);
         db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address)
     } else {
         db.addCmd(cmds, "update transactions set result = 'good'   where id = ?", id)
@@ -1475,6 +1483,7 @@ async function insertTran(tran, data) {
                 tran.toAddress = new Buffer.from(res.executionResult,'hex').toString();
             }
         }
+        let executionResult ="";
         let amount = tran.amount;
         let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
         let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
@@ -1488,6 +1497,8 @@ async function insertTran(tran, data) {
                 fee = (res.gasUsed * NRG_PRICE).toString();
                 feeInt = parseInt(fee.replace(/"/g,'').substring(-1,fee.length-18) ? fee.replace(/"/g,'').substring(-1,fee.length-18) : 0);
                 feePoint = parseInt(fee.replace(/"/g,'').substring(fee.length-18,fee.length) ? fee.replace(/"/g,'').substring(fee.length-18,fee.length) : 0);
+                executionResult = res.executionResult ? res.executionResult: "";
+
             }else {
                 feeInt = "0"
                 feePoint = "0"
@@ -1499,10 +1510,10 @@ async function insertTran(tran, data) {
         let note = tran.remark ? await Base64.decode(tran.remark) : '';
         //let fee = tran.fee.toFixed(0)
         var cmds = [];
-        var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType";
-        var values = "?,?,?,?,?,?,?,?,?,?,?";
+        var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType, executionResult";
+        var values = "?,?,?,?,?,?,?,?,?,?,?,?";
         // var params = [tran.hash, tran.time, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(tran), tran.remark, amountPoint, feePoint];
-        var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type];
+        var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type, executionResult];
         db.addCmd(cmds, "INSERT INTO transactions (" + fields + ") VALUES (" + values + ")", ...params);
         db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset,data.sysTableIndex, data.sysOffset, data.address);
         // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
@@ -1541,7 +1552,7 @@ exports.tranList = function () {
 };
 
 async function getDiceWin(address,cb){
-    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressTo=? and result<>'final-bad' order by creation_date desc ",address);
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,substr(executionResult,64,1) as front  from transactions where addressTo=? and result<>'final-bad' order by creation_date desc ",address);
     if(res.length > 0){
         res.forEach(async function (i) {
             i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
