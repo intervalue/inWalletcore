@@ -384,7 +384,7 @@ function updateHash(addresses) {
                     let vin = result.vin;
                     let vout = result.vout;
                     if (vin[0].address == have.addressFrom) {
-                        db.execute("update transactions set addressTo = ?,amount= ? where id=?", vout[0].scriptPubKey.addresses[0] != have.addressFrom ? vout[0].scriptPubKey.addresses[0] : vout[1].scriptPubKey.addresses[0], Math.abs(parseInt(new BigNumber(vout[0].value).times(100000000))).toString(), have.id);
+                        db.execute("update transactions set addressTo = ?,amount= ? where id=?", vout[0].scriptPubKey.addresses[0] != have.addressFrom ? vout[0].scriptPubKey.addresses[0] : vout[1].scriptPubKey.addresses[0], Math.abs(parseInt(new Bignumber(vout[0].value).times(100000000))).toString(), have.id);
                     } else {
                         db.execute("update transactions set addressFrom = ? where id=?", vin[0].address, have.id);
                     }
@@ -420,7 +420,7 @@ function updateHash(addresses) {
 //         //到这里就是单链
 //         let object = data[i];
 //         console.log("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-//             object.txid, object.timereceived, parseInt(new BigNumber(object.amount).times(100000000).toString()), parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString()), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+//             object.txid, object.timereceived, parseInt(new Bignumber(object.amount).times(100000000).toString()), parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString()), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
 //         try{
 //             let result = object.result;
 //             let vin, vout;
@@ -445,31 +445,31 @@ function updateHash(addresses) {
 //             let vinLength = vin.length;
 //             let voutLength = vout.length;
 //             for(let i=0; i<vinLength; i++){
-//                 vinNumber = new BigNumber(vinNumber).plus(vin[i].value).toString();
+//                 vinNumber = new Bignumber(vinNumber).plus(vin[i].value).toString();
 //             }
 //             for (let i=0; i<voutLength; i++){
-//                 voutNumber = new BigNumber(voutNumber).plus(vout[i].value).toString();
+//                 voutNumber = new Bignumber(voutNumber).plus(vout[i].value).toString();
 //                 if (vout[i].scriptPubKey.addresses[0] == object.address){
-//                     voutOwnNumber = new BigNumber(voutOwnNumber).plus(vout[i].value).toString();
+//                     voutOwnNumber = new Bignumber(voutOwnNumber).plus(vout[i].value).toString();
 //                 }
 //             }
 //             let amount = 0;
-//             let fee = new BigNumber(vinNumber).minus(voutNumber).toString();
+//             let fee = new Bignumber(vinNumber).minus(voutNumber).toString();
 //             if (object.txid == '6fa2c7bc6ae40bfa22c76e5ad645d3de07b3d3a4a1da328c8e37cf0d5b1898be')
 //                 console.log('11111');
 //             if (addressFrom != object.address){
 //                 amount = voutOwnNumber;
 //             } else {
-//                 amount = new BigNumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
+//                 amount = new Bignumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
 //             }
 //             console.log(amount);
 //             console.log(fee);
 //             if (object.confirmations >= 6){
 //                 await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-//                     object.txid, object.time, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
+//                     object.txid, object.time, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
 //             } else {
 //                 await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-//                     object.txid, object.time, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+//                     object.txid, object.time, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
 //             }
 //     }
 // }
@@ -521,23 +521,23 @@ async function insertIntoBTCFromRpc(err, data, lengthFull) {
                         let vinLength = vin.length;
                         let voutLength = vout.length;
                         for (let i = 0; i < vinLength; i++) {
-                            vinNumber = new BigNumber(vinNumber).plus(vin[i].value).toString();
+                            vinNumber = new Bignumber(vinNumber).plus(vin[i].value).toString();
                         }
                         for (let i = 0; i < voutLength; i++) {
-                            voutNumber = new BigNumber(voutNumber).plus(vout[i].value).toString();
+                            voutNumber = new Bignumber(voutNumber).plus(vout[i].value).toString();
                             if (vout[i].scriptPubKey.addresses[0] == have.addressFrom) {
-                                voutOwnNumber = new BigNumber(voutOwnNumber).plus(vout[i].value).toString();
+                                voutOwnNumber = new Bignumber(voutOwnNumber).plus(vout[i].value).toString();
                             }
                         }
                         let amount = 0;
-                        let fee = new BigNumber(vinNumber).minus(voutNumber).toString();
+                        let fee = new Bignumber(vinNumber).minus(voutNumber).toString();
                         if (addressFrom != have.addressFrom) {
                             amount = voutOwnNumber;
                         } else {
-                            amount = new BigNumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
+                            amount = new Bignumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
                         }
                         needUpdate = true;
-                        db.execute("update transactions set addressTo = ?,addressFrom = ?, amount=?, eConfirm = 1, fee=? where id=?", addressTo, addressFrom, parseInt(new BigNumber(amount).times(100000000).toString()), parseInt(new BigNumber(fee).times(100000000).toString()), have.id);
+                        db.execute("update transactions set addressTo = ?,addressFrom = ?, amount=?, eConfirm = 1, fee=? where id=?", addressTo, addressFrom, parseInt(new Bignumber(amount).times(100000000).toString()), parseInt(new Bignumber(fee).times(100000000).toString()), have.id);
                     }
                 });
             }
@@ -546,9 +546,9 @@ async function insertIntoBTCFromRpc(err, data, lengthFull) {
                 if (have.sConfirm >= 6) {
                     await db.execute("update transactions set sConfirm = ?, result = 'good',sStatu = 1 where sHash = ?", object.confirmations, data[i].txid);
                 } else if (have.sConfirm < 6) {
-                    await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
+                    await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
                 } else {
-                    await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
+                    await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
                 }
                 haveUpdate = true;
             }
@@ -606,31 +606,31 @@ async function insertIntoBTCFromRpc(err, data, lengthFull) {
                     let vinLength = vin.length;
                     let voutLength = vout.length;
                     for (let i = 0; i < vinLength; i++) {
-                        vinNumber = new BigNumber(vinNumber).plus(vin[i].value).toString();
+                        vinNumber = new Bignumber(vinNumber).plus(vin[i].value).toString();
                     }
                     for (let i = 0; i < voutLength; i++) {
-                        voutNumber = new BigNumber(voutNumber).plus(vout[i].value).toString();
+                        voutNumber = new Bignumber(voutNumber).plus(vout[i].value).toString();
                         if (vout[i].scriptPubKey.addresses[0] == object.address) {
-                            voutOwnNumber = new BigNumber(voutOwnNumber).plus(vout[i].value).toString();
+                            voutOwnNumber = new Bignumber(voutOwnNumber).plus(vout[i].value).toString();
                         }
                     }
                     let amount = 0;
-                    let fee = new BigNumber(vinNumber).minus(voutNumber).toString();
+                    let fee = new Bignumber(vinNumber).minus(voutNumber).toString();
                     if (addressFrom != object.address) {
                         amount = voutOwnNumber;
                     } else {
-                        amount = new BigNumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
+                        amount = new Bignumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
                     }
                     if (object.confirmations >= 6) {
-                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
+                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
                     } else {
-                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
                     }
                 } else {
                     if (object.confirmations >= 6) {
-                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
                     } else {
-                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+                        await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
                     }
                 }
 
@@ -692,19 +692,19 @@ async function insertIntoBTC(data, address) {
 
                     let fromAddress = vin[0].addr;
                     let toAddress = vout[0].scriptPubKey.addresses == undefined? null: vout[0].scriptPubKey.addresses[0];
-                    let amount = new BigNumber(vout[0].value).times(100000000).toString();
+                    let amount = new Bignumber(vout[0].value).times(100000000).toString();
                     if (toAddress != address && fromAddress != address) {
                         //toAddress = address;
                         let length2 = vout.length;
                         for (let i = 0; i < length2; i++) {
                             if (vout[i].scriptPubKey.addresses != undefined && vout[i].scriptPubKey.addresses[0] == address) {
                                 toAddress = address;
-                                amount = new BigNumber(vout[i].value).times(100000000).toString();
+                                amount = new Bignumber(vout[i].value).times(100000000).toString();
                                 break;
                             }
                         }
                     }
-                    let fee = new BigNumber(item.fees).times(100000000).toString();
+                    let fee = new Bignumber(item.fees).times(100000000).toString();
                     let result = item.confirmations >= 6 ? 'good' : 'pending';
                     let sStatu = item.confirmations >= 6 ? 0 : 1;
                     if (databaseObject == undefined) {
@@ -783,23 +783,23 @@ async function insertIntoBTC(data, address) {
     //                     let vinLength = vin.length;
     //                     let voutLength = vout.length;
     //                     for (let i = 0; i < vinLength; i++) {
-    //                         vinNumber = new BigNumber(vinNumber).plus(vin[i].value).toString();
+    //                         vinNumber = new Bignumber(vinNumber).plus(vin[i].value).toString();
     //                     }
     //                     for (let i = 0; i < voutLength; i++) {
-    //                         voutNumber = new BigNumber(voutNumber).plus(vout[i].value).toString();
+    //                         voutNumber = new Bignumber(voutNumber).plus(vout[i].value).toString();
     //                         if (vout[i].scriptPubKey.addresses[0] == have.addressFrom) {
-    //                             voutOwnNumber = new BigNumber(voutOwnNumber).plus(vout[i].value).toString();
+    //                             voutOwnNumber = new Bignumber(voutOwnNumber).plus(vout[i].value).toString();
     //                         }
     //                     }
     //                     let amount = 0;
-    //                     let fee = new BigNumber(vinNumber).minus(voutNumber).toString();
+    //                     let fee = new Bignumber(vinNumber).minus(voutNumber).toString();
     //                     if (addressFrom != have.addressFrom) {
     //                         amount = voutOwnNumber;
     //                     } else {
-    //                         amount = new BigNumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
+    //                         amount = new Bignumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
     //                     }
     //                     needUpdate = true;
-    //                     db.execute("update transactions set addressTo = ?,addressFrom = ?, amount=?, eConfirm = 1, fee=? where id=?", addressTo, addressFrom, parseInt(new BigNumber(amount).times(100000000).toString()), parseInt(new BigNumber(fee).times(100000000).toString()), have.id);
+    //                     db.execute("update transactions set addressTo = ?,addressFrom = ?, amount=?, eConfirm = 1, fee=? where id=?", addressTo, addressFrom, parseInt(new Bignumber(amount).times(100000000).toString()), parseInt(new Bignumber(fee).times(100000000).toString()), have.id);
     //                 }
     //             });
     //         }
@@ -808,9 +808,9 @@ async function insertIntoBTC(data, address) {
     //             if (have.sConfirm >= 6) {
     //                 await db.execute("update transactions set sConfirm = ?, result = 'good',sStatu = 1 where sHash = ?", object.confirmations, data[i].txid);
     //             } else if (have.sConfirm < 6) {
-    //                 await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
+    //                 await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
     //             } else {
-    //                 await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
+    //                 await db.execute("update transactions set sConfirm = ?, fee=? where sHash = ?", object.confirmations, Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), data[i].txid);
     //             }
     //             haveUpdate = true;
     //         }
@@ -868,31 +868,31 @@ async function insertIntoBTC(data, address) {
     //                 let vinLength = vin.length;
     //                 let voutLength = vout.length;
     //                 for (let i = 0; i < vinLength; i++) {
-    //                     vinNumber = new BigNumber(vinNumber).plus(vin[i].value).toString();
+    //                     vinNumber = new Bignumber(vinNumber).plus(vin[i].value).toString();
     //                 }
     //                 for (let i = 0; i < voutLength; i++) {
-    //                     voutNumber = new BigNumber(voutNumber).plus(vout[i].value).toString();
+    //                     voutNumber = new Bignumber(voutNumber).plus(vout[i].value).toString();
     //                     if (vout[i].scriptPubKey.addresses[0] == object.address) {
-    //                         voutOwnNumber = new BigNumber(voutOwnNumber).plus(vout[i].value).toString();
+    //                         voutOwnNumber = new Bignumber(voutOwnNumber).plus(vout[i].value).toString();
     //                     }
     //                 }
     //                 let amount = 0;
-    //                 let fee = new BigNumber(vinNumber).minus(voutNumber).toString();
+    //                 let fee = new Bignumber(vinNumber).minus(voutNumber).toString();
     //                 if (addressFrom != object.address) {
     //                     amount = voutOwnNumber;
     //                 } else {
-    //                     amount = new BigNumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
+    //                     amount = new Bignumber(vinNumber).minus(fee).minus(voutOwnNumber).toString();
     //                 }
     //                 if (object.confirmations >= 6) {
-    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
+    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'good', '', 0, 2, 2, object.txid, object.confirmations, 1);
     //                 } else {
-    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(fee ? fee : 0).times(100000000).toString())), addressFrom, addressTo, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
     //                 }
     //             } else {
     //                 if (object.confirmations >= 6) {
-    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
     //                 } else {
-    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new BigNumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new BigNumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
+    //                     await db.execute("insert into transactions (id, creation_date, amount, fee, addressFrom, addressTo, result, remark, type, sType, eType, sHash, sConfirm, sStatu) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", object.txid, object.time * 1000, Math.abs(parseInt(new Bignumber(object.amount).times(100000000).toString())), Math.abs(parseInt(new Bignumber(object.fee ? object.fee : 0).times(100000000).toString())), object.address, object.address, 'pending', '', 0, 2, 2, object.txid, object.confirmations, 0);
     //                 }
     //             }
     //
@@ -933,7 +933,7 @@ async function insertIntoETH(result, address, page) {
                 let object = data[i];
                 let gas = object.gasUsed;
                 let gasPrice = object.gasPrice;
-                let fee = new BigNumber(gas).times(new BigNumber(gasPrice)).toString();
+                let fee = new Bignumber(gas).times(new Bignumber(gasPrice)).toString();
                 let fee1 = 0;
                 let fee2 = fee;
                 if (fee.length > 18) {
