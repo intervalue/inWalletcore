@@ -1,5 +1,5 @@
 "use strict";
-
+var config = require('../conf.js');
 var Web3 = require('web3');
 // var util = require('ethereumjs-util')
 
@@ -29,7 +29,10 @@ var Tx = require('ethereumjs-tx');
 //如果是ropsten  将-rinkeby改成-ropsten
 
 function getHistory(address, callbackFun) {
-    var url = "https://api.etherscan.io/api?module=account" + "&action=txlist" + "&address=" + address + "&startblock=0" + "&endblock=99999999" + "&page=1&offset=10" + "&sort=asc" + "&apikey=QP5HJPUX3J5X3IG37D5C1IKQZPXFC8DSSP";
+    //var url = "https://api.etherscan.io/api?module=account" + "&action=txlist" + "&address=" + address + "&startblock=0" + "&endblock=99999999" + "&page=1&offset=10" + "&sort=asc" + "&apikey=QP5HJPUX3J5X3IG37D5C1IKQZPXFC8DSSP";
+    //let url = 'https://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
+    //let url = 'https://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
+    let url = 'http://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
 
     var options = {
         method: 'get',

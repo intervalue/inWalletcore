@@ -62,7 +62,8 @@ exports.configLiveNet ={
     INVE_TRANSACTION_URL: "trade.inve.one",
 	INVE_SEED: "http://seed.trilliontrust.com:25003",
 	ETH_NODE: "http://eth.inve.one:8181",
-	ETH_API:"api.etherscan.io",
+	//ETH_API:"api.etherscan.io",
+	ETH_API:"etherscan.inve.one",
 	BTC_RPC: "btcrpc.inve.one",
 	BTC_API: "btcapi.inve.one"
 }

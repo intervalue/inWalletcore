@@ -266,7 +266,8 @@ function getTransactions (address, cb){
             }
         }
         //let url = 'https://api.etherscan.io/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
-        let url = 'https://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
+        //let url = 'https://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
+        let url = 'http://'+config.URL.ETH_API+'/api?module=account&action=txlist&address=' + address + '&startblock=0&endblock=99999999&page=' + page + '&offset=' + offset + '&sort=asc&apikey=GY5U1CHYHKHT4MMEND1YXJ6UY56S6HMT87';
         webHelper.httpGet(url,null, function(err, result){
             cb(err, result, address, page);
         });
