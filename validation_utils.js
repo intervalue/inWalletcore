@@ -50,7 +50,8 @@ function isStringOfLength(str, len){
 }
 
 function isValidChash(str, len){
-    return (isStringOfLength(str, len) && chash.isChashValid(str));
+    //return (isStringOfLength(str, len) && chash.isChashValid(str));
+    return isStringOfLength(str, len);
 }
 
 function isValidAddressAnyCase(address){

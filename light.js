@@ -1322,7 +1322,7 @@ async function updateTran(tran, data) {
         obj.nrgPrice = b.gasPrice;
         if(obj.toAddress == ""){
             let res = await hashnethelper.getReceipt(id);
-            tran.toAddress = new Buffer.from(res.executionResult,'hex').toString();
+            tran.toAddress = res ? new Buffer.from(res.executionResult,'hex').toString() :"";
         }
     }
     if (obj.type == 2) {
@@ -1350,7 +1350,7 @@ async function updateTran(tran, data) {
     await mutex.lock(["write"], async function (unlock) {
         try {
             let u_result = await db.executeTrans(cmds);
-            if (u_result.affectedRows) {
+            if (!u_result) {
                 //更新列表
                 refreshTranList(tran);
                 //更新界面
@@ -1485,7 +1485,7 @@ async function insertTran(tran, data) {
             tran.nrgPrice = b.gasPrice;
             if(tran.toAddress == ""){
                 let res = await hashnethelper.getReceipt(tran.signature);
-                tran.toAddress = new Buffer.from(res.executionResult,'hex').toString();
+                tran.toAddress = res ? new Buffer.from(res.executionResult,'hex').toString(): "";
             }
         }
         let executionResult ="";

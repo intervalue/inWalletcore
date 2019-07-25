@@ -60,7 +60,7 @@ exports.database = {};
 exports.configLiveNet ={
     INVE_TRANSACTION_getURL: "localtoexp.inve.one:33790",
     INVE_TRANSACTION_URL: "trade.inve.one",
-	INVE_SEED: "http://seed.trilliontrust.com:25003",
+	INVE_SEED: "http://seed.inve.one:25003",
 	ETH_NODE: "http://eth.inve.one:8181",
 	//ETH_API:"api.etherscan.io",
 	ETH_API:"etherscan.inve.one",
@@ -72,8 +72,8 @@ exports.configTestNet ={
     INVE_TRANSACTION_getURL: "172.17.2.118:35796",
     INVE_TRANSACTION_URL: "172.17.2.118:35796",
     INVE_SEED: "http://172.17.2.118:25003",
-    ETH_NODE: "http://13.125.253.106:8181",
-    ETH_API:"api-ropsten.etherscan.io",
+    ETH_NODE: "http://172.17.2.110:8181",
+    ETH_API:"ropsten.inve.one",
     BTC_RPC: "btcrpc.inve.one",
     BTC_API: "btcapi.inve.one"
 }
