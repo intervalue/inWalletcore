@@ -1559,7 +1559,7 @@ exports.tranList = function () {
 };
 
 async function getDiceWin(address,page,pageSize,cb){
-    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo=? and result<>'final-bad' order by creation_date desc limit ? offset ? ",address, page, pageSize);
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo=? and result<>'final-bad' order by creation_date desc limit ? offset ? ",address, pageSize, page-1);
     if(res.length > 0){
         res.forEach(async function (i) {
             i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
