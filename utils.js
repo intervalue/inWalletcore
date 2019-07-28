@@ -89,7 +89,7 @@ let numberToBase64 = (data) => {
     let n = new Decimal(data);
     let k = n.toNumber().toString(16);
     k = k.length % 2 == 1 ? "0" + k : k;
-   return Buffer.from(k, 'hex').toString("base64")
+    return Buffer.from(k, 'hex').toString("base64")
 }
 
 
@@ -128,6 +128,14 @@ let Hexstring2btye = (str)=> {
     return hexA;
 }
 
+let  arrayUnique = (arr, name) => {
+    var hash = {};
+    return arr.reduce(function (item, next) {
+        hash[next[name]] ? '' : hash[next[name]] = true && item.push(next);
+        return item;
+    }, []);
+}
+
 
 module.exports = {
     getprivKey: getprivKey,
@@ -137,5 +145,6 @@ module.exports = {
     base64ToString: base64ToString,
     base64ToNumber: base64ToNumber,
     signature: signature,
-    Hexstring2btye: Hexstring2btye
+    Hexstring2btye: Hexstring2btye,
+    arrayUnique:arrayUnique
 };

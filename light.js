@@ -36,7 +36,7 @@ var ETH_otherStable = 0;
 var ETH_otherPending = 0;
 var ETH_otherTranList = [];
 var ETH_haveUpdate = true;
-
+var timeStamp = Math.round(Date.now());
 var multiUrl = [];
 
 function setMultiUrl(multiUrl2) {
@@ -260,16 +260,16 @@ async function updateHistory(addresses) {
                 //本地存在交易记录，共识网判定交易非法，需要更新交易状态到本地
                 else if (my_tran && tran.isStable && !tran.isValid && my_tran.result != 'final-bad') {
                     bad.push(tran)
-                   //await badTran(tran, data);
+                    //await badTran(tran, data);
                 }
                 //本地不存在此交易记录，需往本地插入交易记录
                 else if (!my_tran) {
                     insert.push(tran)
-                   // await insertTran(tran, data);
+                    // await insertTran(tran, data);
                     //eventBus.emit('newtransaction', tran);
                 } else {
                     await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
-                    eventBus.emit('newtransaction', tran);
+                    //eventBus.emit('newtransaction', tran);
                 }
             }
             if(update.length > 0){
@@ -279,9 +279,13 @@ async function updateHistory(addresses) {
                 await badTran(bad,data);
             }
             if(insert.length > 0){
+                insert = utils.arrayUnique(insert,'hash')
                 await insertTran(insert,data);
             }
-            eventBus.emit('newtransaction', tran);
+
+            //eventBus.emit('newtransaction', tran);
+            await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
+
             // }
         }
     } catch (e) {
@@ -1366,7 +1370,7 @@ async function updateTran(trans, data) {
 
         }
     }
-    db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address)
+    // db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address)
 
     await mutex.lock(["write"], async function (unlock) {
         try {
@@ -1397,7 +1401,7 @@ async function badTran(trans, data) {
         // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
         //用队列的方式更新数据库
     }
-    db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, data.offset, data.address);
+    //db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?", data.tableIndex, data.offset, data.address);
 
     await mutex.lock(["write"], async function (unlock) {
         try {
@@ -1494,65 +1498,65 @@ function getCoinType(type, callback) {
 async function insertTran(trans, data) {
     console.log("\nsaving unit:");
     try {
-    let cmds = [];
-    for (var tran of trans) {
+        let cmds = [];
+        for (var tran of trans) {
 
 
-        // console.log(JSON.stringify(tran));
-        let updateTime = tran.updateTime;
-        let obj = tran;
-        tran = JSON.parse(tran.message);
-        if (tran.hasOwnProperty("data")) {
-            let b = JSON.parse(new Buffer(tran.data, "base64").toString());
-            // tran.amount = utils.base64ToNumber(b.value).toString();
-            // tran.fee = utils.base64ToNumber(b.gasLimit);
-            // tran.toAddress = utils.base64ToString(b.toAddress);
-            // tran.nrgPrice = utils.base64ToNumber(b.gasPrice)
-            tran.amount = b.value;
-            tran.fee = b.gasLimit;
-            tran.toAddress = b.toAddress;
-            tran.nrgPrice = b.gasPrice;
-            if (tran.toAddress == "") {
+            // console.log(JSON.stringify(tran));
+            let updateTime = tran.updateTime;
+            let obj = tran;
+            tran = JSON.parse(tran.message);
+            if (tran.hasOwnProperty("data")) {
+                let b = JSON.parse(new Buffer(tran.data, "base64").toString());
+                // tran.amount = utils.base64ToNumber(b.value).toString();
+                // tran.fee = utils.base64ToNumber(b.gasLimit);
+                // tran.toAddress = utils.base64ToString(b.toAddress);
+                // tran.nrgPrice = utils.base64ToNumber(b.gasPrice)
+                tran.amount = b.value;
+                tran.fee = b.gasLimit;
+                tran.toAddress = b.toAddress;
+                tran.nrgPrice = b.gasPrice;
+                if (tran.toAddress == "") {
+                    let res = await hashnethelper.getReceipt(tran.signature);
+                    tran.toAddress = res ? new Buffer.from(res.executionResult, 'hex').toString() : "";
+                }
+            }
+            let executionResult = "";
+            let error = "";
+            let amount = tran.amount;
+            let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
+            let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
+            let NRG_PRICE = tran.nrgPrice;
+            let fee = (tran.fee * NRG_PRICE).toString();
+            let feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
+            let feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
+            if (tran.type == 2) {
                 let res = await hashnethelper.getReceipt(tran.signature);
-                tran.toAddress = res ? new Buffer.from(res.executionResult, 'hex').toString() : "";
+                if (res) {
+                    fee = (res.gasUsed * NRG_PRICE).toString();
+                    feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
+                    feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
+                    executionResult = res.executionResult ? res.executionResult : "";
+                    error = res.error ? res.error : "";
+
+                } else {
+                    feeInt = "0"
+                    feePoint = "0"
+                }
+
+
             }
+            let Base64 = require('./base64Code');
+            let note = tran.remark ? await Base64.decode(tran.remark) : '';
+            //let fee = tran.fee.toFixed(0)
+            var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType, executionResult,error";
+            var values = "?,?,?,?,?,?,?,?,?,?,?,?,?";
+            // var params = [tran.hash, tran.time, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(tran), tran.remark, amountPoint, feePoint];
+            var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type, executionResult, error];
+            db.addCmd(cmds, "INSERT INTO transactions (" + fields + ") VALUES (" + values + ")", ...params);
+            // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
+            //用队列的方式更新数据库
         }
-        let executionResult = "";
-        let error = "";
-        let amount = tran.amount;
-        let amountInt = parseInt(amount.replace(/"/g, '').substring(-1, amount.length - 18) ? amount.replace(/"/g, '').substring(-1, amount.length - 18) : 0);
-        let amountPoint = parseInt(amount.replace(/"/g, '').substring(amount.length - 18, amount.length) ? amount.replace(/"/g, '').substring(amount.length - 18, amount.length) : 0);
-        let NRG_PRICE = tran.nrgPrice;
-        let fee = (tran.fee * NRG_PRICE).toString();
-        let feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
-        let feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
-        if (tran.type == 2) {
-            let res = await hashnethelper.getReceipt(tran.signature);
-            if (res) {
-                fee = (res.gasUsed * NRG_PRICE).toString();
-                feeInt = parseInt(fee.replace(/"/g, '').substring(-1, fee.length - 18) ? fee.replace(/"/g, '').substring(-1, fee.length - 18) : 0);
-                feePoint = parseInt(fee.replace(/"/g, '').substring(fee.length - 18, fee.length) ? fee.replace(/"/g, '').substring(fee.length - 18, fee.length) : 0);
-                executionResult = res.executionResult ? res.executionResult : "";
-                error = res.error ? res.error : "";
-
-            } else {
-                feeInt = "0"
-                feePoint = "0"
-            }
-
-
-        }
-        let Base64 = require('./base64Code');
-        let note = tran.remark ? await Base64.decode(tran.remark) : '';
-        //let fee = tran.fee.toFixed(0)
-        var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType, executionResult,error";
-        var values = "?,?,?,?,?,?,?,?,?,?,?,?,?";
-        // var params = [tran.hash, tran.time, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(tran), tran.remark, amountPoint, feePoint];
-        var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type, executionResult, error];
-        db.addCmd(cmds, "INSERT INTO transactions (" + fields + ") VALUES (" + values + ")", ...params);
-        // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
-        //用队列的方式更新数据库
-    }
         db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address);
 
         await mutex.lock(["write"], async function (unlock) {
