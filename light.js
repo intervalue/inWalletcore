@@ -274,18 +274,21 @@ async function updateHistory(addresses) {
             }
             if(update.length > 0){
                 await updateTran(update,data);
+                eventBus.emit('my_transactions_became_stable');
             }
             if(bad.length > 0){
                 await badTran(bad,data);
+                eventBus.emit('my_transactions_became_stable');
             }
             if(insert.length > 0){
                 insert = utils.arrayUnique(insert,'hash')
                 await insertTran(insert,data);
+                eventBus.emit('my_transactions_became_stable');
             }
 
             //eventBus.emit('newtransaction', tran);
             await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
-            eventBus.emit('my_transactions_became_stable');
+
             // }
         }
     } catch (e) {
