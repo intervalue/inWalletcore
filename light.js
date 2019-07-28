@@ -285,7 +285,7 @@ async function updateHistory(addresses) {
 
             //eventBus.emit('newtransaction', tran);
             await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
-
+            eventBus.emit('my_transactions_became_stable');
             // }
         }
     } catch (e) {
@@ -933,7 +933,7 @@ async function insertIntoBTC(data, address) {
 function updateStatu(){
     ETH_haveUpdate = true;
     haveUpdate = true;
-    tranList = null;
+    tranList = [];
 }
 
 
@@ -1379,7 +1379,7 @@ async function updateTran(trans, data) {
                 //更新列表
                 refreshTranList(tran);
                 //更新界面
-                eventBus.emit('my_transactions_became_stable');
+                //eventBus.emit('my_transactions_became_stable');
             }
 
         }catch (e) {
@@ -1411,7 +1411,7 @@ async function badTran(trans, data) {
                 //更新列表
                 refreshTranList(tran);
                 //刷新界面
-                eventBus.emit('my_transactions_became_stable');
+               // eventBus.emit('my_transactions_became_stable');
             }
         } catch (e) {
             console.log(e.toString());
@@ -1567,7 +1567,7 @@ async function insertTran(trans, data) {
                     //更新列表
                     refreshTranList(tran);
                     //刷新列表
-                    eventBus.emit('my_transactions_became_stable');
+                    //eventBus.emit('my_transactions_became_stable');
                 }
             } catch (e) {
                 console.log(e.toString());
