@@ -1605,8 +1605,8 @@ async function getDiceWin(address,page,pageSize,cb){
                 i.winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
                 i.winnAmount = i.winnAmount == i.lotteryAmount ? "" : i.winnAmount;
             }
-            i.lotteryFront = i.front//翻币正反面
-            i.winnFront = i.winnAmount ? i.front : i.front == '0' ? '1' : '0'//中奖正反面
+            i.winnFront = i.front //翻币正反面
+            i.lotteryFront = i.winnAmount ? i.front : i.front == '0' ? '1' : '0'//中奖正反面
             delete i.addressTo;
             delete i.fee;
             delete i.amount;
