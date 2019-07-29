@@ -43,6 +43,6 @@ exports.wsUrl = 'ws://172.17.2.122:8080/ipp/v1/ws';
 exports.dappUrl = 'http://172.17.2.122:8090/walletmgmt/v1/dappinfo/list';
 exports.payUrl = 'http://172.17.2.122:8080/ipp/v1/pay/trans';
 
-// exports.wsUrl = 'ws://opay.chainfin.online/ipp/v1/ws';
-// exports.dappUrl = 'http://wallet.chainfin.online:8090/walletmgmt/v1/dappinfo/list';
-// exports.payUrl = 'http://opay.chainfin.online/ipp/v1/pay/trans';
+// exports.wsUrl = 'ws://opay.inve.one/ipp/v1/ws';
+// exports.dappUrl = 'http://wallet.inve.one:8090/walletmgmt/v1/dappinfo/list';
+// exports.payUrl = 'http://opay.inve.one/ipp/v1/pay/trans';

@@ -31,8 +31,8 @@ let currencysUrl3 = "/v1/market/ticker/all";
 
 //*************************************************************************
 //linker接口
-let link = 'openapi.chainfin.online';
-// let link            = 'test.inve.zhang123.vip';
+let link = 'openapi.inve.one';
+
 
 //流通量
 let Liquidity = "/openapi/v2/content/intervaluetotal/list/331"
