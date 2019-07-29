@@ -1573,7 +1573,7 @@ async function insertTran(trans, data) {
                     //eventBus.emit('my_transactions_became_stable');
                 }
             } catch (e) {
-                console.log(e.toString());
+                console.log('insertTran:   ',e.toString());
             } finally {
                 //解锁事务队列
                 await unlock();
@@ -1603,8 +1603,10 @@ async function getDiceWin(address,page,pageSize,cb){
             let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id=?",address,i.id+'_1');
             if(res1.length == 1){
                 i.winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-                i.winnAmount = i.winnAmount == i.lotteryAmount ?"":i.winnAmount;
+                i.winnAmount = i.winnAmount == i.lotteryAmount ? "" : i.winnAmount;
             }
+            i.lotteryFront = i.front//翻币正反面
+            i.winnFront = i.winnAmount ? i.front : i.front == '0' ? '1' : '0'//中奖正反面
             delete i.addressTo;
             delete i.fee;
             delete i.amount;
