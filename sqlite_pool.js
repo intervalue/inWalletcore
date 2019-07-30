@@ -103,15 +103,15 @@ module.exports = function (db_name, MAX_CONNECTIONS, bReadOnly) {
                         result = result.rows || [];
                     //console.log("changes="+this.changes+", affected="+result.affectedRows);
                     var consumed_time = Date.now() - start_ts;
-                    if (consumed_time > 25)
-                        console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
+                    //if (consumed_time > 25)
+                        //console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
                 });
 
                 var start_ts = Date.now();
                 function showTime() {
                     var consumed_time = Date.now() - start_ts;
-                    if (consumed_time > 25)
-                        console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
+                    //if (consumed_time > 25)
+                       // console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
                 }
                 function showError(err) {
                     if (err) {
@@ -266,8 +266,8 @@ module.exports = function (db_name, MAX_CONNECTIONS, bReadOnly) {
                         result = result.rows || [];
                     //console.log("changes="+this.changes+", affected="+result.affectedRows);
                     var consumed_time = Date.now() - start_ts;
-                    if (consumed_time > 25)
-                        console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
+                    // if (consumed_time > 25)
+                    //     console.log("long query took " + consumed_time + "ms:\n" + new_args.filter(function (a, i) { return (i < new_args.length - 1); }).join(", ") + "\nload avg: " + require('os').loadavg().join(', '));
                     last_arg(result);
                 });
 

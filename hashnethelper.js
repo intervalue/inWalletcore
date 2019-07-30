@@ -170,8 +170,8 @@ class HashnetHelper {
             // console.log(rows[0].offsets);
             tableIndex = rows[0].tableIndex;
             sysTableIndex = rows[0].sysTableIndex;
-            offset = initGet ? rows[0].offsets - 10 : rows[0].offsets;
-            sysOffset = initGet ? rows[0].sysOffset - 10 : rows[0].sysOffset;
+            offset = initGet ? (rows[0].offsets - 10) >0 ? rows[0].offsets - 10 : 0 : rows[0].offsets;
+            sysOffset = initGet ? (rows[0].sysOffset - 10) >0 ? rows[0].sysOffset - 10 : 0  : rows[0].sysOffset;
             initGet = false;
         } else {
             await db.execute("INSERT INTO transactions_index (address ,tableIndex,offsets, sysTableIndex, sysOffset) VALUES(?,0,0,0,0)", address);
@@ -285,7 +285,7 @@ class HashnetHelper {
     static async getAccountInfo (address) {
 
         let localfullnode = config.URL.INVE_TRANSACTION_getURL;
-
+        let retry = 3;
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/account/info'), null, {address:address}));
             if (result.code == 200) {
@@ -296,10 +296,18 @@ class HashnetHelper {
             }
         } catch (e) {
             console.log('getAccountInfo error: ', e.toString());
-            return e.toString();
+            retry --;
+            if(!retry) {
+                return null;
+            }
+            else {
+                return HashnetHelper.getAccountInfo(address)
+            }
+            //return e.toString();
         }
 
     }
+
 
     /**
      * 获取合约执行结果
@@ -308,6 +316,7 @@ class HashnetHelper {
      */
     static async getReceipt (hash) {
         let localfullnode = config.URL.INVE_TRANSACTION_getURL;
+        let retry = 3;
         try {
             let result = JSON.parse(await webHelper.httpPost(getUrl(localfullnode, '/v1/getReceipt'), null, {hash:hash}));
             if (result.code == 200) {
@@ -319,7 +328,14 @@ class HashnetHelper {
             }
         } catch (e) {
             console.log('getReceipt error: ', e.toString());
-            return e.toString();
+            retry --;
+            if(!retry) {
+                return null;
+            } else {
+                return HashnetHelper.getReceipt(hash)
+            }
+
+            //return e.toString();
         }
 
     }

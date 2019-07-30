@@ -268,7 +268,7 @@ async function updateHistory(addresses) {
                     // await insertTran(tran, data);
                     //eventBus.emit('newtransaction', tran);
                 } else {
-                    await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
+                    await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex,data.sysOffset, data.address);
                     //eventBus.emit('newtransaction', tran);
                 }
             }
@@ -287,7 +287,7 @@ async function updateHistory(addresses) {
             }
 
             //eventBus.emit('newtransaction', tran);
-            await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.address, data.sysTableIndex,data.sysOffset);
+            await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex,data.sysOffset, data.address);
 
             // }
         }
