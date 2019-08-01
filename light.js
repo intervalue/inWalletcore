@@ -38,7 +38,7 @@ var ETH_otherTranList = [];
 var ETH_haveUpdate = true;
 var timeStamp = Math.round(Date.now());
 var multiUrl = [];
-
+var init = false;
 function setMultiUrl(multiUrl2) {
     multiUrl = multiUrl2;
 }
@@ -226,6 +226,7 @@ async function updateHistory(addresses) {
                     trans = [];
                 }
                 if (result.length > 0) {
+                    trans = [];
                     trans = trans.concat(result);
                 }
             }
@@ -281,13 +282,13 @@ async function updateHistory(addresses) {
                 eventBus.emit('my_transactions_became_stable');
             }
             if(insert.length > 0){
+
                 insert = utils.arrayUnique(insert,'hash')
                 await insertTran(insert,data);
                 eventBus.emit('my_transactions_became_stable');
             }
-
             //eventBus.emit('newtransaction', tran);
-            await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex,data.sysOffset, data.address);
+            // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ?, sysTableIndex=?, sysOffset=? WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex,data.sysOffset, data.address);
 
             // }
         }
@@ -937,6 +938,7 @@ function updateStatu(){
     ETH_haveUpdate = true;
     haveUpdate = true;
     tranList = [];
+    init = true;
 }
 
 
@@ -1373,7 +1375,7 @@ async function updateTran(trans, data) {
 
         }
     }
-    // db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address)
+    db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address)
 
     await mutex.lock(["write"], async function (unlock) {
         try {
@@ -1414,7 +1416,7 @@ async function badTran(trans, data) {
                 //更新列表
                 refreshTranList(tran);
                 //刷新界面
-               // eventBus.emit('my_transactions_became_stable');
+                // eventBus.emit('my_transactions_became_stable');
             }
         } catch (e) {
             console.log(e.toString());
@@ -1561,7 +1563,10 @@ async function insertTran(trans, data) {
             //用队列的方式更新数据库
         }
         db.addCmd(cmds, "UPDATE transactions_index SET tableIndex= ?,offsets= ?,sysTableIndex = ?, sysOffset = ?  WHERE address = ?", data.tableIndex, data.offset, data.sysTableIndex, data.sysOffset, data.address);
-
+        if(init){
+            init = false;
+            return;
+        }
         await mutex.lock(["write"], async function (unlock) {
             try {
                 //更新数据库

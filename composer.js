@@ -30,7 +30,7 @@ if(!NRG_PRICE) {
             eventBus.emit('nrgPrice',NRG_PRICE);
             clearInterval(tranNrgPrice)
         }
-    }, 2 * 1000);
+    }, 10 * 1000);
 }
 
 var bGenesis = false;
