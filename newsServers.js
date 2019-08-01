@@ -162,53 +162,10 @@ function getCurrencyData(limit, page, fields, cb) {
     });
 }
 
-/*function getInveData(cb) {
-    //计算人民币
-    getSymbolData("fcoin", 'ethusdt', "cny", function (err, res) {
-        res = JSON.parse(res);
-        if (res != null) {
-            getSymbolData("fcoin", 'ethusdt', "usdt", function (err2, res2) {
-                res2 = JSON.parse(res2);
-                //汇率
-                var rate = res.close / res2.close;
-                alert(rate);
-                let suburul = inveCurrencyUrl + "inveusdt";
-                webHelper.httpGet(getUrl(fcoin, suburul), null, function (err3, res3) {
-                    res3 = JSON.parse(res3);
-                    if (res3.status == 0) {
-                        //最新成交价 usdt
-                        var newPrice = res3.data.ticker[0];
-                        //最新成交价 cny
-                        var cnyPrice = newPrice * rate;
-                        var oldPrice = res3.data.ticker[6];
 
-                        //涨幅
-                        var market = (newPrice - oldPrice) / oldPrice;
-
-                        var data = { newPrice, cnyPrice, oldPrice, market };
-                        cb(data);
-                    }
-                });
-            });
-        } else {
-            console.log("connection error ~!");
-        }
-    });
-}*/
 
 function getInveData2(cb) {
 
-    let suburul = inveCurrencyUrl + "inveusdt";
-    // let suburul = currencyInve;
-    //美刀汇率
-
-    //webHelper.httpGet(getUrl(fcoin, suburul, "https"), null, function (err, res) {
-    // webHelper.httpGet(getUrl(schail, schailinveCurrencyUrl, "https"), null, function (err, res) {
-    //     if (err) {
-    //         console.log("error:" + err);
-    //         cb(null);
-    //         return;
-    //     }
     webHelper.httpGet(getUrl(link, Liquidity, null), null, function (err1, res) {
         if (err1) {
             console.log("error:" + err1);
