@@ -1603,21 +1603,21 @@ exports.tranList = function () {
 async function getDiceWin(addresses,cb){
     let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo in(?) and result<>'final-bad' order by creation_date desc ",addresses);
     if(res.length > 0){
-        res.forEach(async function (i) {
-            i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom in(?) and id=?",addresses,i.id+'_1');
+        for(let i in res) {
+            res[i].lotteryAmount = new Bignumber(res[i].amount).plus(new Bignumber(res[i].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom in(?) and id=?",addresses,res[i].id+'_1');
             if(res1.length == 1){
-                i.winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-                i.winnAmount = i.winnAmount == i.lotteryAmount ? "" : i.winnAmount;
+                res[i].winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
+                res[i].winnAmount = res[i].winnAmount == res[i].lotteryAmount ? "" : res[i].winnAmount;
             }
-            i.winnFront = i.front //翻币正反面
-            i.lotteryFront = i.winnAmount ? i.front : i.front == '0' ? '1' : '0'//中奖正反面
-            delete i.addressTo;
-            delete i.fee;
-            delete i.amount;
-            delete i.fee_point;
-            delete i.amount_point;
-        });
+            res[i].winnFront = res[i].front //翻币正反面
+            res[i].lotteryFront = res[i].winnAmount ? res[i].front : res[i].front == '0' ? '1' : '0'//中奖正反面
+            delete res[i].addressTo;
+            delete res[i].fee;
+            delete res[i].amount;
+            delete res[i].fee_point;
+            delete res[i].amount_point;
+        };
         cb(res)
     }else {
         cb([])
