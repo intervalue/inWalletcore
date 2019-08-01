@@ -1605,7 +1605,7 @@ async function getDiceWin(addresses,cb){
     if(res.length > 0){
         res.forEach(async function (i) {
             i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
-            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom=? and id=?",address,i.id+'_1');
+            let res1 = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo from transactions where addressFrom in(?) and id=?",addresses,i.id+'_1');
             if(res1.length == 1){
                 i.winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
                 i.winnAmount = i.winnAmount == i.lotteryAmount ? "" : i.winnAmount;
