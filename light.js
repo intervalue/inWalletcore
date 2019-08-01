@@ -1600,8 +1600,8 @@ exports.tranList = function () {
     return tranList;
 };
 
-async function getDiceWin(address,cb){
-    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo=? and result<>'final-bad' order by creation_date desc ",address);
+async function getDiceWin(addresses,cb){
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo in(?) and result<>'final-bad' order by creation_date desc ",addresses);
     if(res.length > 0){
         res.forEach(async function (i) {
             i.lotteryAmount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
