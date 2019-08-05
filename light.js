@@ -1618,6 +1618,7 @@ async function getDiceWin(addresses,cb){
             delete res[i].amount;
             delete res[i].fee_point;
             delete res[i].amount_point;
+            delete res[i].data;
         };
         cb(res)
     }else {
