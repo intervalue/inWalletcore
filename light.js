@@ -1611,8 +1611,8 @@ async function getDiceWin(addresses,cb){
                 res[i].winnAmount = res[i].winnAmount == res[i].lotteryAmount ? "" : res[i].winnAmount;
             }
             let b = JSON.parse(new Buffer(res[i].data, "base64").toString());
-            res[i].winnFront = b ? b.callData.substr(71,1) : res[i].front //翻币正反面
-            res[i].lotteryFront = res[i].winnAmount ? res[i].front : res[i].front == '0' ? '1' : '0'//中奖正反面
+            res[i].winnFront =res[i].front //翻币正反面
+            res[i].lotteryFront =  b ? b.callData.substr(71,1) : res[i].winnAmount ? res[i].front : res[i].front == '0' ? '1' : '0'//中奖正反面
             delete res[i].addressTo;
             delete res[i].fee;
             delete res[i].amount;
