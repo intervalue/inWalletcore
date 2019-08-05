@@ -7,7 +7,7 @@
  * @author: lhp
  * @time: 2019-07-16 11:04
  */
-var VERSION = 2;
+var VERSION = 3;
 
 var async = require('async');
 var bCordova = (typeof window === 'object' && window.cordova);
@@ -32,6 +32,9 @@ function migrateDb(connection, onDone){
         if(version < 2 || version == 18){
             connection.addQuery(arrQueries, "ALTER TABLE transactions ADD COLUMN executionResult CHAR ");
             connection.addQuery(arrQueries, "ALTER TABLE transactions ADD COLUMN error CHAR ");
+        }
+        if(version < 3 || version == 18){
+            connection.addQuery(arrQueries, "ALTER TABLE transactions ADD COLUMN data TEXT ");
         }
         connection.addQuery(arrQueries, "PRAGMA user_version="+VERSION);
         async.series(arrQueries, function(){

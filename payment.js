@@ -296,8 +296,8 @@ let inserTrans = async (obj) => {
     await mutex.lock(["write"], async function (unlock) {
         try {
             //更新数据库
-            await db.execute("INSERT INTO transactions (id,creation_date,amount,fee,addressFrom,addressTo,result,type,remark,amount_point,fee_point, multiHash,tranType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                obj.signature, obj.timestamp, amountInt, feeInt, obj.fromAddress, obj.toAddress, "pending", obj.sendType ? obj.sendType : 0 ,note, amountPoint, feePoint,obj.order,obj.type);
+            await db.execute("INSERT INTO transactions (id,creation_date,amount,fee,addressFrom,addressTo,result,type,remark,amount_point,fee_point, multiHash,tranType,data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                obj.signature, obj.timestamp, amountInt, feeInt, obj.fromAddress, obj.toAddress, "pending", obj.sendType ? obj.sendType : 0 ,note, amountPoint, feePoint,obj.order,obj.type,obj.data);
             //更新列表
             obj.isStable = 1;
             obj.isValid = 0;

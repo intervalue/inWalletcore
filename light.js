@@ -1554,10 +1554,10 @@ async function insertTran(trans, data) {
             let Base64 = require('./base64Code');
             let note = tran.remark ? await Base64.decode(tran.remark) : '';
             //let fee = tran.fee.toFixed(0)
-            var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType, executionResult,error";
-            var values = "?,?,?,?,?,?,?,?,?,?,?,?,?";
+            var fields = "id, creation_date, amount, fee, addressFrom, addressTo, result, remark, amount_point, fee_point, tranType, executionResult,error,data";
+            var values = "?,?,?,?,?,?,?,?,?,?,?,?,?,?";
             // var params = [tran.hash, tran.time, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(tran), tran.remark, amountPoint, feePoint];
-            var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type, executionResult, error];
+            var params = [tran.signature, updateTime, amountInt, feeInt || 0, tran.fromAddress, tran.toAddress, getResultFromTran(obj), note, amountPoint, feePoint, tran.type, executionResult, error,tran.data];
             db.addCmd(cmds, "INSERT INTO transactions (" + fields + ") VALUES (" + values + ")", ...params);
             // await db.execute("UPDATE transactions_index SET tableIndex= ?,offsets= ? WHERE address = ?",data.tableIndex,data.offset,data.address);
             //用队列的方式更新数据库
@@ -1601,7 +1601,7 @@ exports.tranList = function () {
 };
 
 async function getDiceWin(addresses,cb){
-    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo in(?) and result<>'final-bad' order by creation_date desc ",addresses);
+    let res = await db.toList("select id,creation_date,amount,fee,amount_point,fee_point,addressFrom,addressTo,result,data,case error when'' then substr(executionResult,64,1) else''end as front  from transactions where addressTo in(?) and result<>'final-bad' order by creation_date desc ",addresses);
     if(res.length > 0){
         for(let i in res) {
             res[i].lotteryAmount = new Bignumber(res[i].amount).plus(new Bignumber(res[i].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
@@ -1610,7 +1610,8 @@ async function getDiceWin(addresses,cb){
                 res[i].winnAmount = new Bignumber(res1[0].amount).plus(new Bignumber(res1[0].amount_point).div(new Bignumber(constants.INVE_VALUE))).toFixed();
                 res[i].winnAmount = res[i].winnAmount == res[i].lotteryAmount ? "" : res[i].winnAmount;
             }
-            res[i].winnFront = res[i].front //翻币正反面
+            let b = JSON.parse(new Buffer(res[i].data, "base64").toString());
+            res[i].winnFront = b ? b.callData.substr(71,1) : res[i].front //翻币正反面
             res[i].lotteryFront = res[i].winnAmount ? res[i].front : res[i].front == '0' ? '1' : '0'//中奖正反面
             delete res[i].addressTo;
             delete res[i].fee;
