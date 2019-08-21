@@ -155,7 +155,7 @@ async function contractTransactionData(opts,cb) {
     try{
         let info = await hashnethelper.getAccountInfo(opts.fromAddress);
         let nonce = info.nonce;
-        let callData = opts.callData;
+        //let callData = opts.callData;
         let gasPrice = NRG_PRICE;
         let value = amountstr;
         let gasLimit = constants.BASE_NRG;
@@ -173,7 +173,8 @@ async function contractTransactionData(opts,cb) {
         let data ={
             nonce: nonce.toString(),
             //callData: utils.stringToBase64("3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData),
-            callData: "3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData,
+            //callData: "3a93424a000000000000000000000000000000000000000000000000000000000000000"+callData,
+            callData: opts.callData,
             gasPrice: gasPrice.toString(),
             value: value.toString(),
             gasLimit: gasLimit.toString(),
