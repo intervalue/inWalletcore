@@ -128,12 +128,32 @@ let Hexstring2btye = (str)=> {
     return hexA;
 }
 
+
+/**
+* @description:
+*
+* @param: 去重
+* @return
+* @author: lhp
+* @time: 2019-08-22 16-49
+*/
 let  arrayUnique = (arr, name) => {
     var hash = {};
     return arr.reduce(function (item, next) {
         hash[next[name]] ? '' : hash[next[name]] = true && item.push(next);
         return item;
     }, []);
+}
+
+/**
+ * 自动补位
+ * @param num
+ * @param length
+ * @returns {string}
+ * @constructor
+ */
+let  PrefixInteger =(num, length) => {
+    return (Array(length).join('0') + num).slice(-length);
 }
 
 
@@ -146,5 +166,6 @@ module.exports = {
     base64ToNumber: base64ToNumber,
     signature: signature,
     Hexstring2btye: Hexstring2btye,
-    arrayUnique:arrayUnique
+    arrayUnique:arrayUnique,
+    PrefixInteger:PrefixInteger
 };

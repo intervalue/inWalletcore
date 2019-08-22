@@ -317,6 +317,53 @@ let inserTrans = async (obj) => {
     });
 }
 
+
+/**
+* @description:
+*
+* @param: 增加获取锁仓汇率
+* @return
+* @author: lhp
+* @time: 2019-08-22 14-27
+*/
+
+let getRate = async (cb) =>{
+    let url ='http://wallet.inve.one/walletmgmt/v1/lkInfo/list?version=1';
+    try{
+        let res = JSON.parse(await webHelper.httpGet(url, header,null));
+        if(res.code == 0){
+            if(cb) cb(null,res.result)
+            else return res.result;
+        }
+
+    }catch (e) {
+        console.log('getRate error:   ',e.toString());
+        if(cb){cb(e.toString())}
+        else {return ''}
+    }
+
+}
+
+/**
+* @description:
+*
+* @param: 构造callData数据结构
+* @return
+* @author: lhp
+* @time: 2019-08-22 16-41
+*/
+let buildCallData = async (data,cb) => {
+    try{
+        let res = data.method+utils.PrefixInteger(data.timeTerm.toString(16),64)+utils.PrefixInteger(data.balTerm.toString(16),64)+utils.PrefixInteger(data.interestRate.toString(16),64);
+        if(cb) cb(null,res);
+        else return res;
+    }catch (e) {
+        console.log("buildCallData error: "+e.toString());
+        if(cb) cb(e.toString());
+        else return '';
+    }
+}
+
 //组装访问共识网的url
 let getUrl = (localfullnode, suburl) => {
     return 'http://' + localfullnode + suburl;
@@ -334,5 +381,7 @@ module.exports = {
     sendTransactions: sendTransactions,
     transactionContext: transactionContext,
     sendTransactionToOtherServer: sendTransactionToOtherServer,
-    contractTransactionData: contractTransactionData
+    contractTransactionData: contractTransactionData,
+    getRate: getRate,
+    buildCallData: buildCallData
 }
