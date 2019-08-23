@@ -128,6 +128,19 @@ let Hexstring2btye = (str)=> {
     return hexA;
 }
 
+/**
+* @description:
+*
+* @param: String转16
+* @return
+* @author: lhp
+* @time: 2019-08-23 17-06
+*/
+let String2Hex = (data) => {
+    return Buffer.from(data, "base64").toString("hex");
+
+}
+
 
 /**
 * @description:
@@ -167,5 +180,6 @@ module.exports = {
     signature: signature,
     Hexstring2btye: Hexstring2btye,
     arrayUnique:arrayUnique,
-    PrefixInteger:PrefixInteger
+    PrefixInteger:PrefixInteger,
+    String2Hex:String2Hex
 };
