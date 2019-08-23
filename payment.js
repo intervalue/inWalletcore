@@ -354,7 +354,7 @@ let getRate = async (cb) =>{
 */
 let buildCallData = async (data,cb) => {
     try{
-        let res = data.method+utils.PrefixInteger(data.timeTerm.toString(16),64)+utils.PrefixInteger(data.balTerm.toString(16),64)+utils.PrefixInteger(data.interestRate.toString(16),64);
+        let res = data.method+utils.PrefixInteger(data.timeTerm.toString(16),64)+utils.PrefixInteger(data.interestRate.toString(16),64);
         if(cb) cb(null,res);
         else return res;
     }catch (e) {
