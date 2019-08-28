@@ -136,8 +136,10 @@ let Hexstring2btye = (str)=> {
 * @author: lhp
 * @time: 2019-08-23 17-06
 */
-let String2Hex = (data) => {
-    return Buffer.from(data, "base64").toString("hex");
+let String2Hex = (data, cb) => {
+    let str =  Buffer.from(data, "base64").toString("hex");
+    if(cb) cb(str);
+    else return str;
 
 }
 
