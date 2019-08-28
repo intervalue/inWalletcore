@@ -140,7 +140,7 @@ let String2Hex = (data, cb) => {
     try{
         let str =  Buffer.from(data, "base64").toString("hex");
         if(cb) cb(null ,str);
-        else return str;  
+        else return str;
     }catch (e) {
         console.log("String2Hex: ",e.toString())
         if(cb) cb(e.toString())
@@ -178,6 +178,19 @@ let  PrefixInteger =(num, length) => {
     return (Array(length).join('0') + num).slice(-length);
 }
 
+let stringToHex = (data,cb) => {
+    var val="";
+    for(var i = 0; i < data.length; i++){
+        if(val == "")
+            val = data.charCodeAt(i).toString(16);
+        else
+            val += "" + data.charCodeAt(i).toString(16);
+    }
+    if(cb) cb(null, val)
+    else return val;
+
+}
+
 
 module.exports = {
     getprivKey: getprivKey,
@@ -190,5 +203,6 @@ module.exports = {
     Hexstring2btye: Hexstring2btye,
     arrayUnique:arrayUnique,
     PrefixInteger:PrefixInteger,
-    String2Hex:String2Hex
+    String2Hex:String2Hex,
+    stringToHex:stringToHex
 };
