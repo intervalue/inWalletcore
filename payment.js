@@ -303,6 +303,7 @@ let inserTrans = async (obj) => {
             obj.isStable = 1;
             obj.isValid = 0;
             light.refreshTranList(obj);
+            eventBus.emit('my_transactions_became_stable');
             return '';
 
         }
