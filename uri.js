@@ -8,7 +8,8 @@ var Mnemonic = require('bitcore-mnemonic');
 
 function parseUri(uri, callbacks) {
     var protocol = conf.program || 'intervalue';
-    var re = new RegExp('^' + protocol + '-(.+):(.+)$', 'i');
+   // var re = new RegExp('^' + protocol + '-(.+):(.+)$', 'i');
+    var re = new RegExp('(.+)$', 'i');
     var arrMatches = uri.match(re);
     if (!arrMatches) return callbacks.ifError("no " + protocol + " prefix");
     var value = arrMatches[2];
@@ -16,7 +17,7 @@ function parseUri(uri, callbacks) {
 
     // pairing / start a chat
     //	var arrPairingMatches = value.match(/^([\w\/+]{44})@([\w.:\/-]+)(?:#|%23)([\w\/+]+)$/);
-    var arrPairingMatches = value.replace('%23', '#').match(/^([\w\/+]{44})@([\w.:\/-]+)#(.+)$/);
+    var arrPairingMatches = value ? value.replace('%23', '#').match(/^([\w\/+]{44})@([\w.:\/-]+)#(.+)$/): "";
     if (arrPairingMatches) {
         objRequest.type = "pairing";
         objRequest.pubkey = arrPairingMatches[1];
@@ -28,7 +29,7 @@ function parseUri(uri, callbacks) {
     }
 
     // authentication/authorization
-    var arrAuthMatches = value.match(/^auth\?(.+)$/);
+    var arrAuthMatches = value ? value.match(/^auth\?(.+)$/):"";
     if (arrAuthMatches) {
         objRequest.type = "auth";
         var query_string = arrAuthMatches[1];
@@ -50,7 +51,7 @@ function parseUri(uri, callbacks) {
     }
 
     // claim textcoin using mnemonic
-    var arrMnemonicMatches = value.match(/^textcoin\?(.+)$/);
+    var arrMnemonicMatches = value ? value.match(/^textcoin\?(.+)$/): "";
     if (arrMnemonicMatches) {
         objRequest.type = "textcoin";
         var mnemonic = arrMnemonicMatches[1].split('-').join(' ');
@@ -67,14 +68,16 @@ function parseUri(uri, callbacks) {
     }
 
     // pay to address
-    var arrParts = value.split('?');
+    var arrParts =value ?  value.split('?'): "";
     if (arrParts.length > 2) return callbacks.ifError("too many question marks");
-    var address = decodeURIComponent(arrParts[0]);
+    //var address = decodeURIComponent(arrParts[0]);
+    var address = value ? decodeURIComponent(arrParts[0]) : uri;
     var query_string = arrParts[1];
     var walletType = arrMatches[1];
-    if (!ValidationUtils.isValidAddress(address, walletType)) return callbacks.ifError("address " + address + " is invalid");
+    if (!ValidationUtils.isValidAddress(address, 'INVE') && !ValidationUtils.isValidAddress(address, 'ETH') &&!ValidationUtils.isValidAddress(address, 'BTC') ) return callbacks.ifError("address " + address + " is invalid");
     objRequest.type = "address";
     objRequest.walletType = walletType;
+    objRequest.walletType = ValidationUtils.isValidAddress(address, 'INVE') ? 'INVE' : ValidationUtils.isValidAddress(address, 'ETH') ? 'ETH' : 'BTC';
     objRequest.address = address;
     if (query_string) {
         var assocParams = parseQueryString(query_string);
