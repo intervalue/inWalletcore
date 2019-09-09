@@ -1628,13 +1628,18 @@ async function getDiceWin(addresses,cb){
 
 
 async function getAddressHistory(address, cb){
-    let res = await db.toList("select *,case when result = 'final-bad' then 'invalid' when addressFrom in (?) then 'sent' else 'received' end as action \n\
+    try{
+        let res = await db.toList("select *,case when result = 'final-bad' then 'invalid' when addressFrom in (?) then 'sent' else 'received' end as action \n\
 		 from transactions where(addressFrom in (?) or addressTo in (?))", address, address, address);
-    if(res.length > 0){
-        cb(null,res)
-    }else {
-        cb(null,[])
+        if(res.length > 0){
+            cb(null,res)
+        }else {
+            cb(null,[])
+        }
+    }catch (e) {
+        cb(e.toString())
     }
+
 }
 
 exports.updateHistory = updateHistory;
