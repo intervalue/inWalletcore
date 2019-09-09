@@ -1626,6 +1626,17 @@ async function getDiceWin(addresses,cb){
     }
 }
 
+
+async function getAddressHistory(address, cb){
+    let res = await db.toList("select *,case when result = 'final-bad' then 'invalid' when addressFrom in (?) then 'sent' else 'received' end as action \n\
+		 from transactions where(addressFrom in (?) or addressTo in (?))", address, address, address);
+    if(res.length > 0){
+        cb(null,res)
+    }else {
+        cb(null,[])
+    }
+}
+
 exports.updateHistory = updateHistory;
 exports.updateOtherHistory = updateOtherHistory;
 exports.refreshTranList = refreshTranList;
@@ -1646,4 +1657,5 @@ exports.getCheck = getCheck;
 exports.setMultiUrl = setMultiUrl;
 exports.updateStatu = updateStatu;
 exports.getDiceWin = getDiceWin;
+exports.getAddressHistory = getAddressHistory;
 //exports.getPending = getPending;
