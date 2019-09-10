@@ -1630,8 +1630,11 @@ async function getDiceWin(addresses,cb){
 async function getAddressHistory(address, cb){
     try{
         let res = await db.toList("select *,case when result = 'final-bad' then 'invalid' when addressFrom in (?) then 'sent' else 'received' end as action \n\
-		 from transactions where(addressFrom in (?) or addressTo in (?))", address, address, address);
+		 from transactions where(addressFrom in (?) or addressTo in (?)) order by creation_date desc", address, address, address);
         if(res.length > 0){
+            res.forEach(function (i) {
+                i.amount = new Bignumber(i.amount).plus(new Bignumber(i.amount_point).div(constants.INVE_VALUE)).toFixed()
+            })
             cb(null,res)
         }else {
             cb(null,[])
