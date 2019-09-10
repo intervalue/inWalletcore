@@ -329,9 +329,8 @@ let inserTrans = async (obj) => {
 */
 
 let getRate = async (cb) =>{
-    let url ='http://wallet.inve.one/walletmgmt/v1/lkInfo/list?version=1';
     try{
-        let res = JSON.parse(await webHelper.httpGet(url, header,null));
+        let res = JSON.parse(await webHelper.httpGet(config.URL.INVE_RATE, header,null));
         if(res.code == 0){
             if(cb) cb(null,res.result)
             else return res.result;

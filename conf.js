@@ -65,7 +65,8 @@ exports.configLiveNet ={
 	//ETH_API:"api.etherscan.io",
 	ETH_API:"etherscan.inve.one",
 	BTC_RPC: "btcrpc.inve.one",
-	BTC_API: "btcapi.inve.one"
+	BTC_API: "btcapi.inve.one",
+	INVE_RATE:"http://wallet.inve.one/walletmgmt/v1/lkInfo/list?version=1"
 }
 
 exports.configTestNet ={
@@ -75,7 +76,8 @@ exports.configTestNet ={
     ETH_NODE: "http://172.17.2.110:8181",
     ETH_API:"ropsten.inve.one",
     BTC_RPC: "btcrpc.inve.one",
-    BTC_API: "btcapi.inve.one"
+    BTC_API: "btcapi.inve.one",
+    INVE_RATE:"http://wallet.inve.one/walletmgmt/v1/lkInfo/list?version=1"
 }
 
 exports.URL = exports.configTestNet;
